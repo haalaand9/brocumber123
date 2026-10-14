@@ -605,6 +605,22 @@ input[type="range"] {
   gap: 0.8rem;
 }
 
+.saved-section {
+  margin-top: 1rem;
+  border-top: 1px solid rgba(126, 255, 135, 0.2);
+  padding-top: 0.8rem;
+}
+
+.saved-section h4 {
+  margin: 0 0 0.7rem;
+}
+
+.saved-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 0.8rem;
+}
+
 .shop-item {
   background: rgba(13, 17, 14, 0.85);
   border: 1px solid rgba(120, 255, 124, 0.24);
@@ -613,6 +629,11 @@ input[type="range"] {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+}
+
+.shop-item.saved-item {
+  border-color: rgba(255, 214, 92, 0.5);
+  background: rgba(35, 28, 8, 0.7);
 }
 
 .shop-item-title {
@@ -664,6 +685,17 @@ input[type="range"] {
 
 .shop-item button {
   margin-top: auto;
+}
+
+.shop-item button.saved {
+  background: rgba(255, 214, 92, 0.14);
+  border-color: rgba(255, 214, 92, 0.45);
+  color: #ffe39a;
+}
+
+.shop-item button:disabled {
+  opacity: 0.75;
+  cursor: default;
 }
 
 .inventory-section {

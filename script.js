@@ -169,6 +169,7 @@ const ui = {
   statusText: document.getElementById("statusText"),
   shopCoinsText: document.getElementById("shopCoinsText"),
   shopItems: document.getElementById("shopItems"),
+  savedItems: document.getElementById("savedItems"),
   inventoryList: document.getElementById("inventoryList"),
   shopOverlay: document.getElementById("shopOverlay"),
   gameOverOverlay: document.getElementById("gameOverOverlay"),
@@ -410,6 +411,7 @@ class Player {
     this.weapons = [];
     this.inventory = [];
     this.coins = 0;
+    this.savedItems = [];
     this.kills = 0;
     this.lives = character.id === "guardian" ? 4 : 0;
     this.form = "default";
@@ -787,6 +789,33 @@ class Shop {
     playAudioTick("shop");
   }
 
+  itemKey(item) {
+    return `${item.type}:${item.id}`;
+  }
+
+  isSaved(item) {
+    return this.game.player.savedItems.some((saved) => this.itemKey(saved) === this.itemKey(item));
+  }
+
+  saveItem(item) {
+    if (this.isSaved(item)) return;
+
+    const record = {
+      id: item.id,
+      type: item.type,
+      data: item.data,
+      price: item.price
+    };
+
+    this.game.player.savedItems.push(record);
+    setStatus(`${item.type === "weapon" ? getWeaponById(item.id).name : item.data.name} saved for later.`);
+    this.render();
+  }
+
+  removeSavedItem(item) {
+    this.game.player.savedItems = this.game.player.savedItems.filter((saved) => this.itemKey(saved) !== this.itemKey(item));
+  }
+
   render() {
     ui.shopCoinsText.textContent = String(this.game.player.coins);
     const inventory = this.game.player.weapons.length ? this.game.player.weapons : [{ id: "none", level: 0 }];
@@ -795,6 +824,8 @@ class Shop {
       .map((entry) => `<span class="inventory-chip"><span class="inventory-icon">${getWeaponGlyph(entry.id)}</span><strong>${getWeaponById(entry.id).name}</strong><span class="level">Lv.${entry.level}</span></span>`)
       .join("") || '<span class="inventory-chip"><span class="inventory-icon">—</span>No weapons</span>';
 
+    const savedList = this.game.player.savedItems.filter((saved) => !this.items.some((item) => this.itemKey(item) === this.itemKey(saved)));
+
     ui.shopItems.innerHTML = this.items
       .map((item) => {
         const label = item.type === "weapon" ? getWeaponById(item.id).name : item.data.name;
@@ -802,6 +833,9 @@ class Shop {
         const tag = item.type === "weapon" ? getWeaponById(item.id).type : "Upgrade";
         const icon = item.type === "weapon" ? getWeaponGlyph(item.id) : "⬆️";
         const canBuy = item.type === "weapon" ? this.game.player.coins >= item.price && this.game.canBuyWeapon(item.id) : this.game.player.coins >= item.price && this.game.canBuyUpgrade(item.data.id);
+        const isSaved = this.isSaved(item);
+        const buttonLabel = canBuy ? "Buy" : (isSaved ? "Saved" : "Save");
+
         return `
           <div class="shop-item">
             <div class="shop-item-title">
@@ -816,7 +850,7 @@ class Shop {
               <span>Price: ${item.price}</span>
               <span>${item.type === "weapon" ? getWeaponById(item.id).category : "Stat"}</span>
             </div>
-            <button data-item-id="${item.id}" data-item-type="${item.type}" class="${canBuy ? "" : "disabled"}">${canBuy ? "Buy" : "Need More"}</button>
+            <button data-item-id="${item.id}" data-item-type="${item.type}" class="${canBuy ? "" : (isSaved ? "saved" : "disabled")}" ${!canBuy && isSaved ? "disabled" : ""}>${buttonLabel}</button>
           </div>
         `;
       })
@@ -827,6 +861,51 @@ class Shop {
         const itemId = button.dataset.itemId;
         const itemType = button.dataset.itemType;
         const item = this.items.find((entry) => entry.id === itemId && entry.type === itemType);
+        if (!item) return;
+
+        const canBuy = item.type === "weapon" ? this.game.player.coins >= item.price && this.game.canBuyWeapon(item.id) : this.game.player.coins >= item.price && this.game.canBuyUpgrade(item.data.id);
+        if (canBuy) {
+          this.purchase(item);
+          return;
+        }
+
+        if (this.isSaved(item)) return;
+        this.saveItem(item);
+      });
+    });
+
+    ui.savedItems.innerHTML = savedList.length ? savedList
+      .map((item) => {
+        const label = item.type === "weapon" ? getWeaponById(item.id).name : item.data.name;
+        const detail = item.type === "weapon" ? getWeaponById(item.id).description : item.data.description;
+        const tag = item.type === "weapon" ? getWeaponById(item.id).type : "Upgrade";
+        const icon = item.type === "weapon" ? getWeaponGlyph(item.id) : "⬆️";
+        const canBuy = item.type === "weapon" ? this.game.player.coins >= item.price && this.game.canBuyWeapon(item.id) : this.game.player.coins >= item.price && this.game.canBuyUpgrade(item.data.id);
+        return `
+          <div class="shop-item saved-item">
+            <div class="shop-item-title">
+              <div class="shop-item-name-wrap">
+                <span class="shop-item-icon">${icon}</span>
+                <h5>${label}</h5>
+              </div>
+              <span class="tag">${tag}</span>
+            </div>
+            <small>${detail}</small>
+            <div class="meta">
+              <span>Price: ${item.price}</span>
+              <span>${item.type === "weapon" ? getWeaponById(item.id).category : "Stat"}</span>
+            </div>
+            <button data-item-id="${item.id}" data-item-type="${item.type}" class="${canBuy ? "" : "saved"}" ${canBuy ? "" : "disabled"}>${canBuy ? "Buy" : "Saved"}</button>
+          </div>
+        `;
+      })
+      .join("") : '<span class="inventory-chip"><span class="inventory-icon">⭐</span>No saved items</span>';
+
+    ui.savedItems.querySelectorAll("button[data-item-id]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const itemId = button.dataset.itemId;
+        const itemType = button.dataset.itemType;
+        const item = this.game.player.savedItems.find((entry) => entry.id === itemId && entry.type === itemType);
         if (!item) return;
         this.purchase(item);
       });
@@ -855,6 +934,7 @@ class Shop {
         setStatus("Weapon slots full.");
         return;
       }
+      this.removeSavedItem(item);
       this.game.player.coins -= price;
       this.game.player.addWeapon(item.id, true);
       setStatus(`${getWeaponById(item.id).name} acquired. Shop rerolled.`);
@@ -870,6 +950,7 @@ class Shop {
         setStatus("This upgrade is unavailable.");
         return;
       }
+      this.removeSavedItem(item);
       this.game.player.coins -= price;
       this.game.applyUpgrade(item.id);
       this.game.updateHud();
