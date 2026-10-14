@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brocumber</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <div id="menuScreen" class="screen active">
+        <div class="menu-shell">
+          <div class="title-block">
+            <p class="eyebrow">survival roguelike</p>
+            <h1>BROCUMBER</h1>
+          </div>
+
+          <div class="menu-actions">
+            <button id="playButton" class="primary">Play</button>
+            <button id="charactersButton">Characters</button>
+            <button id="settingsButton">Settings</button>
+          </div>
+
+          <div class="controls-panel">
+            <h3>Controls</h3>
+            <ul>
+              <li>Move: WASD / Arrow Keys</li>
+              <li>Pause: Esc</li>
+              <li>Transform: Shift (Shapeshifter)</li>
+              <li>Shop: Buy weapons and upgrades between waves</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div id="characterScreen" class="screen">
+        <div class="topbar">
+          <h2>Character Selection</h2>
+          <button id="backToMenuFromCharacters" class="ghost">Back</button>
+        </div>
+
+        <div id="characterGrid" class="character-grid"></div>
+
+        <div class="selection-footer">
+          <div id="selectedCharacterInfo" class="selected-character-info"></div>
+          <button id="startGameButton" class="primary">Start Game</button>
+        </div>
+
+        <div id="weaponSelectionPanel" class="weapon-selection-panel">
+          <div class="weapon-selection-header">
+            <h3>Choose Starter Weapon</h3>
+            <span id="weaponSelectionHint">Restricted by your class</span>
+          </div>
+          <div id="weaponChoiceList" class="weapon-choice-list"></div>
+        </div>
+      </div>
+
+      <div id="settingsScreen" class="screen">
+        <div class="settings-panel">
+          <h2>Settings</h2>
+
+          <label class="setting-row">
+            <span>Sound effects volume</span>
+            <input id="soundVolumeInput" type="range" min="0" max="1" step="0.05" value="0.5" />
+          </label>
+
+          <label class="checkbox-row">
+            <input id="damageNumbersToggle" type="checkbox" checked />
+            <span>Show damage numbers</span>
+          </label>
+
+          <button id="backToMenuFromSettings" class="primary">Back</button>
+        </div>
+      </div>
+
+      <div id="gameScreen" class="screen">
+        <div id="hud" class="hud">
+          <div class="hud-group left">
+            <div class="hud-box health-box">
+              <span class="label">HP</span>
+              <strong id="healthText">15 / 15</strong>
+            </div>
+            <div class="hud-box">
+              <span class="label">Coins</span>
+              <strong id="coinsText">0</strong>
+            </div>
+            <div class="hud-box">
+              <span class="label">Wave</span>
+              <strong id="waveText">1</strong>
+            </div>
+            <div class="hud-box">
+              <span class="label">Defeated</span>
+              <strong id="killsText">0</strong>
+            </div>
+          </div>
+
+          <div class="hud-group right">
+            <div class="hud-box">
+              <span class="label">Lives</span>
+              <strong id="livesText">0</strong>
+            </div>
+            <button id="pauseButton" class="hud-button">Pause</button>
+          </div>
+        </div>
+
+        <canvas id="gameCanvas" width="900" height="600"></canvas>
+        <div id="statusText" class="status-text"></div>
+
+        <div id="shopOverlay" class="overlay hidden">
+          <div class="shop-panel">
+            <div class="shop-header">
+              <div>
+                <p class="eyebrow small">wave clear</p>
+                <h3>Weapon Shop</h3>
+              </div>
+
+              <div class="shop-actions">
+                <div class="coin-pill">Coins: <strong id="shopCoinsText">0</strong></div>
+                <button id="rerollButton">Reroll</button>
+                <button id="continueButton" class="primary">Continue</button>
+              </div>
+            </div>
+
+            <div id="shopItems" class="shop-items"></div>
+
+            <div class="inventory-section">
+              <h4>Equipped Weapons</h4>
+              <div id="inventoryList" class="inventory-list"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="gameOverOverlay" class="overlay hidden">
+          <div class="game-over-panel">
+            <p class="eyebrow small">run ended</p>
+            <h2>Game Over</h2>
+
+            <div class="summary-grid">
+              <div><span>Waves survived</span><strong id="finalWaveText">0</strong></div>
+              <div><span>Enemies defeated</span><strong id="finalKillsText">0</strong></div>
+              <div><span>Coins collected</span><strong id="finalCoinsText">0</strong></div>
+            </div>
+
+            <div class="game-over-actions">
+              <button id="restartButton" class="primary">Restart</button>
+              <button id="returnMenuButton">Menu</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
