@@ -818,10 +818,18 @@ class Shop {
 
   render() {
     ui.shopCoinsText.textContent = String(this.game.player.coins);
+    const itemTint = (item) => {
+      if (item.type === "upgrade") return "linear-gradient(180deg, rgba(255,214,92,0.35), rgba(255,255,255,0.06))";
+      const weapon = getWeaponById(item.id);
+      return weapon.type === "melee"
+        ? "linear-gradient(180deg, rgba(189,232,255,0.35), rgba(255,255,255,0.06))"
+        : "linear-gradient(180deg, rgba(109,224,171,0.35), rgba(255,255,255,0.06))";
+    };
+
     const inventory = this.game.player.weapons.length ? this.game.player.weapons : [{ id: "none", level: 0 }];
     ui.inventoryList.innerHTML = inventory
       .filter((entry) => entry.id !== "none")
-      .map((entry) => `<span class="inventory-chip"><span class="inventory-icon">${getWeaponGlyph(entry.id)}</span><strong>${getWeaponById(entry.id).name}</strong><span class="level">Lv.${entry.level}</span></span>`)
+      .map((entry) => `<span class="inventory-chip"><span class="inventory-icon" style="background:${itemTint({type: "weapon", id: entry.id})}">${getWeaponGlyph(entry.id)}</span><strong>${getWeaponById(entry.id).name}</strong><span class="level">Lv.${entry.level}</span></span>`)
       .join("") || '<span class="inventory-chip"><span class="inventory-icon">—</span>No weapons</span>';
 
     const savedList = this.game.player.savedItems.filter((saved) => !this.items.some((item) => this.itemKey(item) === this.itemKey(saved)));
@@ -840,7 +848,7 @@ class Shop {
           <div class="shop-item">
             <div class="shop-item-title">
               <div class="shop-item-name-wrap">
-                <span class="shop-item-icon">${icon}</span>
+                <span class="shop-item-icon" style="background:${itemTint(item)}">${icon}</span>
                 <h5>${label}</h5>
               </div>
               <span class="tag">${tag}</span>
@@ -885,7 +893,7 @@ class Shop {
           <div class="shop-item saved-item">
             <div class="shop-item-title">
               <div class="shop-item-name-wrap">
-                <span class="shop-item-icon">${icon}</span>
+                <span class="shop-item-icon" style="background:${itemTint(item)}">${icon}</span>
                 <h5>${label}</h5>
               </div>
               <span class="tag">${tag}</span>
