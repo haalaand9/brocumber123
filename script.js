@@ -117,7 +117,7 @@ const CHARACTERS = [
   { id: "well_rounded", name: "Well-Rounded", description: "Versatile and reliable in any setup.", restrictions: "None", badge: "Balanced", perk: "+3 melee / +3 ranged", stats: { maxHealth: 0, meleeDamage: 3, rangedDamage: 3, armor: 0, speed: 0, luck: 0 }, ability: "well_rounded" },
   { id: "crazy", name: "Crazy", description: "Aggressive but fragile and unlucky.", restrictions: "None", badge: "High risk", perk: "+50 damage, +50 HP, -200 luck, -20 armor", stats: { maxHealth: 50, meleeDamage: 50, rangedDamage: 50, armor: -20, speed: 0, luck: -200 }, ability: "crazy" },
   { id: "old", name: "Old", description: "Slow, grim, and resilient to attrition.", restrictions: "None", badge: "Veteran", perk: "-63% enemies, -50 damage, +21 HP, stronger enemy hits", stats: { maxHealth: 21, meleeDamage: -50, rangedDamage: -50, armor: 0, speed: 0, luck: 0 }, ability: "old" },
-  { id: "young", name: "Young", description: "Fast, strong, and more dangerous than it looks.", restrictions: "None", badge: "Youthful", perk: "+63% enemies, +100 damage, +43 HP, +43 armor, -20 damage each ranged weapon", stats: { maxHealth: 43, meleeDamage: 100, rangedDamage: 100, armor: 43, speed: 0, luck: 0 }, ability: "young" },
+  { id: "young", name: "Young", description: "Fast, strong, and more dangerous than it looks.", restrictions: "None", badge: "Youthful", perk: "+31% enemies, +50 damage, +21 HP, +21 armor, -20 speed, -10 damage each ranged weapon", stats: { maxHealth: 21, meleeDamage: 50, rangedDamage: 50, armor: 21, speed: -20, luck: 0 }, ability: "young" },
   { id: "baby", name: "Baby", description: "Tiny but surprisingly efficient.", restrictions: "None", badge: "Tiny", perk: "-50% enemies", stats: { maxHealth: 0, meleeDamage: 0, rangedDamage: 0, armor: 0, speed: 0, luck: 0 }, ability: "baby" },
   { id: "robot", name: "Robot", description: "A drill-only machine with armor plating.", restrictions: "Drill only", badge: "Machine", perk: "+20 armor, +15 damage, no healing", stats: { maxHealth: 0, meleeDamage: 15, rangedDamage: 15, armor: 20, speed: 0, luck: 0 }, ability: "robot" },
   { id: "soldier", name: "Soldier", description: "Disciplined gun specialist.", restrictions: "Gun weapons only", badge: "Officer", perk: "-15 damage, loses 10 HP per pair of identical weapons", stats: { maxHealth: 0, meleeDamage: -15, rangedDamage: -15, armor: 0, speed: 0, luck: 0 }, ability: "soldier" },
@@ -549,7 +549,7 @@ class Player {
     }
 
     if (this.characterId === "young") {
-      const rangedPenalty = weaponTypeBreakdown.ranged * 20;
+      const rangedPenalty = weaponTypeBreakdown.ranged * 10;
       this.rangedDamage = effective.rangedDamage - rangedPenalty;
     }
 
@@ -1319,8 +1319,6 @@ class Game {
     const player = this.player;
     if (!player) return;
     const attackRange = 30;
-    const facingX = player.facingX || 1;
-    const facingY = player.facingY || 0;
     let target = null;
     let best = Infinity;
 
@@ -1329,9 +1327,6 @@ class Game {
       const dy = enemy.y - player.y;
       const dist = Math.hypot(dx, dy);
       if (dist >= attackRange + enemy.radius) return;
-
-      const dot = (dx * facingX + dy * facingY) / (dist || 1);
-      if (dot < 0.1) return;
 
       if (dist < best) {
         best = dist;
@@ -1474,8 +1469,6 @@ class Game {
   performMeleeSwing(weapon, damage) {
     const player = this.player;
     const range = weapon.id === "drill" ? 70 : 42;
-    const facingX = player.facingX || 1;
-    const facingY = player.facingY || 0;
     let bestTarget = null;
     let bestDistance = Infinity;
 
@@ -1487,9 +1480,6 @@ class Game {
       const dy = enemy.y - player.y;
       const dist = Math.hypot(dx, dy);
       if (dist > range + enemy.radius) return;
-
-      const dot = (dx * facingX + dy * facingY) / (dist || 1);
-      if (dot < 0.15) return;
 
       if (dist < bestDistance) {
         bestDistance = dist;
