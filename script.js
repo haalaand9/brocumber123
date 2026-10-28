@@ -618,14 +618,18 @@ class Player {
 class Enemy {
   constructor(type, x, y, wave) {
     const template = ENEMY_TYPES[type];
+    const waveTier = wave <= 5 ? 1 : wave <= 10 ? 2 : 3;
+    const hpByTier = { 1: 10, 2: 15, 3: 20 };
+    const damageByTier = { 1: 3, 2: 6, 3: 9 };
+
     this.type = type;
     this.name = template.label;
-    this.baseHp = template.hp;
-    this.maxHp = template.hp * (1 + (wave - 1) * 0.18);
+    this.baseHp = hpByTier[waveTier];
+    this.maxHp = this.baseHp;
     this.hp = this.maxHp;
     this.size = template.size;
     this.speed = template.speed * (1 + (wave - 1) * 0.08);
-    this.damage = template.damage * (1 + (wave - 1) * 0.12);
+    this.damage = damageByTier[waveTier];
     this.coins = template.coins;
     this.color = template.color;
     this.x = x;
