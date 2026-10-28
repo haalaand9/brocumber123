@@ -1765,28 +1765,58 @@ class Game {
   renderMenuBackground() {
     const ctx = this.ctx;
     ctx.clearRect(0, 0, ARENA_WIDTH, ARENA_HEIGHT);
-    ctx.fillStyle = "#03070b";
+
+    const sky = ctx.createLinearGradient(0, 0, 0, ARENA_HEIGHT);
+    sky.addColorStop(0, "#071116");
+    sky.addColorStop(0.35, "#0d1b26");
+    sky.addColorStop(0.7, "#0d141c");
+    sky.addColorStop(1, "#03080d");
+    ctx.fillStyle = sky;
     ctx.fillRect(0, 0, ARENA_WIDTH, ARENA_HEIGHT);
 
-    ctx.fillStyle = "#0f171f";
-    for (let x = 0; x < ARENA_WIDTH; x += 90) {
-      for (let y = 0; y < ARENA_HEIGHT; y += 70) {
-        const buildingWidth = 54;
-        const buildingHeight = 46 + ((x + y) % 3) * 18;
-        ctx.fillRect(x + 12, y + 16, buildingWidth, buildingHeight);
+    const moonGlow = ctx.createRadialGradient(ARENA_WIDTH * 0.52, 110, 20, ARENA_WIDTH * 0.52, 110, 420);
+    moonGlow.addColorStop(0, "rgba(184, 223, 255, 0.24)");
+    moonGlow.addColorStop(0.23, "rgba(134, 170, 214, 0.12)");
+    moonGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
+    ctx.fillStyle = moonGlow;
+    ctx.fillRect(0, 0, ARENA_WIDTH, ARENA_HEIGHT);
 
-        ctx.fillStyle = "rgba(211, 223, 255, 0.18)";
+    ctx.fillStyle = "rgba(170, 210, 255, 0.05)";
+    for (let i = 0; i < 7; i += 1) {
+      const y = 90 + i * 30;
+      ctx.fillRect(0, y, ARENA_WIDTH, 1);
+    }
+
+    ctx.fillStyle = "#0d1a24";
+    for (let x = -80; x < ARENA_WIDTH + 80; x += 90) {
+      for (let y = 0; y < ARENA_HEIGHT; y += 70) {
+        const buildingWidth = 52;
+        const buildingHeight = 42 + ((x + y) % 4) * 22;
+        const xPos = x + 14;
+        const yPos = y + 24;
+
+        ctx.fillRect(xPos, yPos, buildingWidth, buildingHeight);
+
+        ctx.fillStyle = "rgba(211, 223, 255, 0.16)";
         for (let wx = 0; wx < 3; wx += 1) {
           for (let wy = 0; wy < 3; wy += 1) {
-            ctx.fillRect(x + 18 + wx * 12, y + 22 + wy * 12, 6, 9);
+            const winX = xPos + 10 + wx * 12;
+            const winY = yPos + 10 + wy * 12;
+            const lit = (wx + wy + (x / 30)) % 2 === 0;
+            ctx.fillStyle = lit ? "rgba(238, 245, 255, 0.26)" : "rgba(140, 166, 197, 0.12)";
+            ctx.fillRect(winX, winY, 6, 9);
           }
         }
-        ctx.fillStyle = "#0f171f";
+
+        ctx.fillStyle = "#0d1a24";
       }
     }
 
-    ctx.strokeStyle = "rgba(214, 223, 240, 0.1)";
-    ctx.lineWidth = 2;
+    ctx.fillStyle = "rgba(11, 19, 23, 0.86)";
+    ctx.fillRect(0, 260, ARENA_WIDTH, 120);
+
+    ctx.strokeStyle = "rgba(214, 223, 240, 0.08)";
+    ctx.lineWidth = 1;
     for (let y = 30; y <= ARENA_HEIGHT; y += 90) {
       ctx.beginPath();
       ctx.moveTo(0, y);
@@ -1794,7 +1824,7 @@ class Game {
       ctx.stroke();
     }
 
-    for (let x = 50; x <= ARENA_WIDTH; x += 110) {
+    for (let x = 30; x <= ARENA_WIDTH; x += 110) {
       ctx.beginPath();
       ctx.moveTo(x, 0);
       ctx.lineTo(x, ARENA_HEIGHT);
@@ -1811,23 +1841,48 @@ class Game {
       return;
     }
 
-    ctx.fillStyle = "#03070b";
+    const sky = ctx.createLinearGradient(0, 0, 0, ARENA_HEIGHT);
+    sky.addColorStop(0, "#050a10");
+    sky.addColorStop(0.25, "#0d1720");
+    sky.addColorStop(0.52, "#121d2a");
+    sky.addColorStop(1, "#04070b");
+    ctx.fillStyle = sky;
     ctx.fillRect(0, 0, ARENA_WIDTH, ARENA_HEIGHT);
 
-    ctx.fillStyle = "#111922";
-    for (let x = 0; x < ARENA_WIDTH; x += 110) {
+    const cityGlow = ctx.createRadialGradient(ARENA_WIDTH * 0.52, 120, 16, ARENA_WIDTH * 0.52, 120, 360);
+    cityGlow.addColorStop(0, "rgba(138, 188, 255, 0.2)");
+    cityGlow.addColorStop(0.35, "rgba(95, 144, 198, 0.12)");
+    cityGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
+    ctx.fillStyle = cityGlow;
+    ctx.fillRect(0, 0, ARENA_WIDTH, ARENA_HEIGHT);
+
+    ctx.fillStyle = "#101a22";
+    for (let x = -80; x < ARENA_WIDTH + 80; x += 110) {
       for (let y = 0; y < ARENA_HEIGHT; y += 90) {
-        const bw = 72;
-        const bh = 48 + ((x + y) % 4) * 16;
-        ctx.fillRect(x + 22, y + 16, bw, bh);
+        const bw = 76;
+        const bh = 52 + ((x + y) % 4) * 18;
+        const xPos = x + 18;
+        const yPos = y + 12;
+        ctx.fillRect(xPos, yPos, bw, bh);
+
+        ctx.fillStyle = "rgba(221, 232, 255, 0.12)";
+        for (let wx = 0; wx < 4; wx += 1) {
+          for (let wy = 0; wy < 3; wy += 1) {
+            const lit = (wx + wy + (x / 22)) % 2 === 0;
+            ctx.fillStyle = lit ? "rgba(223, 232, 255, 0.22)" : "rgba(120, 155, 198, 0.08)";
+            ctx.fillRect(xPos + 10 + wx * 14, yPos + 10 + wy * 12, 7, 9);
+          }
+        }
+        ctx.fillStyle = "#101a22";
       }
     }
 
     ctx.fillStyle = "#0a0f14";
-    ctx.fillRect(0, 240, ARENA_WIDTH, 120);
+    ctx.fillRect(0, 242, ARENA_WIDTH, 120);
+
     ctx.fillStyle = "rgba(214, 223, 240, 0.10)";
-    for (let x = 0; x <= ARENA_WIDTH; x += 36) {
-      ctx.fillRect(x, 240, 2, 120);
+    for (let x = 0; x <= ARENA_WIDTH; x += 34) {
+      ctx.fillRect(x, 240, 1.5, 120);
     }
 
     ctx.strokeStyle = "rgba(206, 216, 234, 0.07)";
