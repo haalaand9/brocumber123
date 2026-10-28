@@ -1923,7 +1923,7 @@ class Game {
       ctx.shadowColor = weaponColor;
       ctx.shadowBlur = 12;
       ctx.beginPath();
-      ctx.arc(0, 0, 26, -0.8 + (1 - swingProgress) * 0.8, 0.8 - (1 - swingProgress) * 0.8);
+      ctx.arc(0, 0, 26, 0, Math.PI * 2);
       ctx.stroke();
 
       ctx.fillStyle = "#f4f7ff";
