@@ -74,30 +74,34 @@ function getCharacterGlyph(characterId) {
 }
 
 const WEAPONS = [
-  { id: "pistol", name: "Pistol", category: "Gun", type: "ranged", damage: 10, reload: 0.95, price: 12, color: "#d7f0ff", description: "Reliable sidearm with steady shots.", attack: "projectile" },
-  { id: "revolver", name: "Revolver", category: "Gun", type: "ranged", damage: 7, reload: 0.84, price: 10, color: "#dfd5ff", description: "Fast, compact revolver.", attack: "projectile" },
-  { id: "flamethrower", name: "Flamethrower", category: "Gun", type: "ranged", damage: 14, reload: 1.06, price: 20, color: "#ff9a5a", description: "Scorches enemies in a close-range stream.", attack: "flame" },
-  { id: "suitcase", name: "Suitcase", category: "Other", type: "melee", damage: 4, reload: 0.57, price: 8, color: "#d2c7a6", description: "A surprising melee finisher.", attack: "melee" },
-  { id: "sword", name: "Sword", category: "Medieval", type: "melee", damage: 14, reload: 0.76, price: 16, color: "#dfe6ff", description: "Classic steel swing.", attack: "melee" },
-  { id: "crowbar", name: "Crowbar", category: "Other", type: "melee", damage: 12, reload: 0.85, price: 15, color: "#dcd7b3", description: "Cracks through armor.", attack: "melee" },
-  { id: "minigun", name: "Minigun", category: "Gun", type: "ranged", damage: 4, reload: 0.12, price: 22, color: "#cfe6ff", description: "Very fast spray of bullets.", attack: "projectile" },
-  { id: "shotgun", name: "Shotgun", category: "Gun", type: "ranged", damage: 15, reload: 1.12, price: 18, color: "#f2d0aa", description: "Fires a spread of pellets.", attack: "shotgun" },
-  { id: "spear", name: "Spear", category: "Medieval", type: "melee", damage: 6, reload: 1.01, price: 13, color: "#d2e7d8", description: "Long reach with strong thrusts.", attack: "melee" },
-  { id: "torch", name: "Torch", category: "Medieval", type: "melee", damage: 8, reload: 0.75, price: 12, color: "#ffb76b", description: "Burning melee weapon.", attack: "melee" },
-  { id: "ak47", name: "AK-47", category: "Gun", type: "ranged", damage: 14, reload: 0.76, price: 18, color: "#d9e9ff", description: "High damage automatic rifle.", attack: "projectile" },
-  { id: "wrench", name: "Wrench", category: "Other", type: "melee", damage: 10, reload: 0.67, price: 12, color: "#d5d6d0", description: "Heavy blunt strike.", attack: "melee" },
-  { id: "rock", name: "Rock", category: "Medieval", type: "ranged", damage: 5, reload: 0.45, price: 9, color: "#b2a68c", description: "A crude but effective projectile.", attack: "projectile" },
-  { id: "stick", name: "Stick", category: "Other", type: "melee", damage: 7, reload: 0.67, price: 8, color: "#c9b28f", description: "Simple, dependable melee.", attack: "melee" },
-  { id: "drill", name: "Drill", category: "Other", type: "melee", damage: 20, reload: 1.43, price: 24, color: "#d7ecff", description: "Powerful close-range burst damage.", attack: "drill" },
-  { id: "pillow", name: "Pillow", category: "Other", type: "melee", damage: 6, reload: 0.65, price: 7, color: "#f0eec9", description: "Soft but surprisingly persistent.", attack: "melee" },
-  { id: "speaker", name: "Speaker", category: "Other", type: "ranged", damage: 13, reload: 0.87, price: 18, color: "#d2dcff", description: "Sends out a resonant sound-wave blast.", attack: "speaker" },
-  { id: "dumbbell", name: "Dumbbell", category: "Other", type: "melee", damage: 8, reload: 0.89, price: 11, color: "#d0d7e6", description: "A heavy weight with brutal swings.", attack: "melee" },
-  { id: "rocket_launcher", name: "Rocket Launcher", category: "Gun", type: "ranged", damage: 18, reload: 1.34, price: 28, color: "#ffbf7a", description: "Explodes on impact for splash damage.", attack: "rocket" },
-  { id: "belt", name: "Belt", category: "Other", type: "melee", damage: 7, reload: 0.43, price: 9, color: "#c3d6b5", description: "Quick whip-like attack.", attack: "melee" },
-  { id: "hockey_stick", name: "Hockey Stick", category: "Sports", type: "melee", damage: 8, reload: 0.97, price: 14, color: "#dfeff7", description: "Solid sports melee weapon.", attack: "melee" },
-  { id: "lacrosse_ball", name: "Lacrosse Ball", category: "Sports", type: "ranged", damage: 2, reload: 0.5, price: 8, color: "#d9ffe0", description: "Fast, simple projectile.", attack: "projectile" },
-  { id: "wand", name: "Wand", category: "Medieval", type: "ranged", damage: 4, reload: 0.89, price: 11, color: "#d6d0ff", description: "Magic projectile attack.", attack: "wand" }
+  { id: "pistol", name: "Pistol", category: "Gun", type: "ranged", damage: 10, reload: 0.95, price: 12, color: "#d7f0ff", description: "Reliable sidearm with steady shots.", attack: "projectile", range: 25 },
+  { id: "revolver", name: "Revolver", category: "Gun", type: "ranged", damage: 7, reload: 0.84, price: 10, color: "#dfd5ff", description: "Fast, compact revolver.", attack: "projectile", range: 25 },
+  { id: "flamethrower", name: "Flamethrower", category: "Gun", type: "ranged", damage: 14, reload: 1.06, price: 20, color: "#ff9a5a", description: "Scorches enemies in a close-range stream.", attack: "flame", range: 25 },
+  { id: "suitcase", name: "Suitcase", category: "Other", type: "melee", damage: 4, reload: 0.57, price: 8, color: "#d2c7a6", description: "A surprising melee finisher.", attack: "melee", range: 25 },
+  { id: "sword", name: "Sword", category: "Medieval", type: "melee", damage: 14, reload: 0.76, price: 16, color: "#dfe6ff", description: "Classic steel swing.", attack: "melee", range: 25 },
+  { id: "crowbar", name: "Crowbar", category: "Other", type: "melee", damage: 12, reload: 0.85, price: 15, color: "#dcd7b3", description: "Cracks through armor.", attack: "melee", range: 25 },
+  { id: "minigun", name: "Minigun", category: "Gun", type: "ranged", damage: 4, reload: 0.12, price: 22, color: "#cfe6ff", description: "Very fast spray of bullets.", attack: "projectile", range: 25 },
+  { id: "shotgun", name: "Shotgun", category: "Gun", type: "ranged", damage: 15, reload: 1.12, price: 18, color: "#f2d0aa", description: "Fires a spread of pellets.", attack: "shotgun", range: 25 },
+  { id: "spear", name: "Spear", category: "Medieval", type: "melee", damage: 6, reload: 1.01, price: 13, color: "#d2e7d8", description: "Long reach with strong thrusts.", attack: "melee", range: 25 },
+  { id: "torch", name: "Torch", category: "Medieval", type: "melee", damage: 8, reload: 0.75, price: 12, color: "#ffb76b", description: "Burning melee weapon.", attack: "melee", range: 25 },
+  { id: "ak47", name: "AK-47", category: "Gun", type: "ranged", damage: 14, reload: 0.76, price: 18, color: "#d9e9ff", description: "High damage automatic rifle.", attack: "projectile", range: 25 },
+  { id: "wrench", name: "Wrench", category: "Other", type: "melee", damage: 10, reload: 0.67, price: 12, color: "#d5d6d0", description: "Heavy blunt strike.", attack: "melee", range: 25 },
+  { id: "rock", name: "Rock", category: "Medieval", type: "ranged", damage: 5, reload: 0.45, price: 9, color: "#b2a68c", description: "A crude but effective projectile.", attack: "projectile", range: 25 },
+  { id: "stick", name: "Stick", category: "Other", type: "melee", damage: 7, reload: 0.67, price: 8, color: "#c9b28f", description: "Simple, dependable melee.", attack: "melee", range: 25 },
+  { id: "drill", name: "Drill", category: "Other", type: "melee", damage: 20, reload: 1.43, price: 24, color: "#d7ecff", description: "Powerful close-range burst damage.", attack: "drill", range: 25 },
+  { id: "pillow", name: "Pillow", category: "Other", type: "melee", damage: 6, reload: 0.65, price: 7, color: "#f0eec9", description: "Soft but surprisingly persistent.", attack: "melee", range: 25 },
+  { id: "speaker", name: "Speaker", category: "Other", type: "ranged", damage: 13, reload: 0.87, price: 18, color: "#d2dcff", description: "Sends out a resonant sound-wave blast.", attack: "speaker", range: 25 },
+  { id: "dumbbell", name: "Dumbbell", category: "Other", type: "melee", damage: 8, reload: 0.89, price: 11, color: "#d0d7e6", description: "A heavy weight with brutal swings.", attack: "melee", range: 25 },
+  { id: "rocket_launcher", name: "Rocket Launcher", category: "Gun", type: "ranged", damage: 18, reload: 1.34, price: 28, color: "#ffbf7a", description: "Explodes on impact for splash damage.", attack: "rocket", range: 25 },
+  { id: "belt", name: "Belt", category: "Other", type: "melee", damage: 7, reload: 0.43, price: 9, color: "#c3d6b5", description: "Quick whip-like attack.", attack: "melee", range: 25 },
+  { id: "hockey_stick", name: "Hockey Stick", category: "Sports", type: "melee", damage: 8, reload: 0.97, price: 14, color: "#dfeff7", description: "Solid sports melee weapon.", attack: "melee", range: 25 },
+  { id: "lacrosse_ball", name: "Lacrosse Ball", category: "Sports", type: "ranged", damage: 2, reload: 0.5, price: 8, color: "#d9ffe0", description: "Fast, simple projectile.", attack: "projectile", range: 25 },
+  { id: "wand", name: "Wand", category: "Medieval", type: "ranged", damage: 4, reload: 0.89, price: 11, color: "#d6d0ff", description: "Magic projectile attack.", attack: "wand", range: 25 }
 ];
+
+WEAPONS.forEach((weapon) => {
+  weapon.range = weapon.range ?? 25;
+});
 
 const UPGRADE_DEFS = [
   { id: "max_health", name: "Max Health", price: 16, description: "+10 maximum health" },
@@ -211,6 +215,11 @@ function getCharacterById(id) {
 
 function getWeaponById(id) {
   return WEAPONS.find((weapon) => weapon.id === id) || WEAPONS[0];
+}
+
+function getWeaponRange(weaponId) {
+  const weapon = getWeaponById(weaponId);
+  return Number.isFinite(weapon.range) ? weapon.range : 25;
 }
 
 function weaponRestrictionFilter(characterId, weaponId) {
@@ -1318,7 +1327,7 @@ class Game {
   performBiteAttack() {
     const player = this.player;
     if (!player) return;
-    const attackRange = 30;
+    const attackRange = 25;
     let target = null;
     let best = Infinity;
 
@@ -1468,7 +1477,7 @@ class Game {
 
   performMeleeSwing(weapon, damage) {
     const player = this.player;
-    const range = weapon.id === "drill" ? 70 : 42;
+    const range = getWeaponRange(weapon.id);
     let bestTarget = null;
     let bestDistance = Infinity;
 
