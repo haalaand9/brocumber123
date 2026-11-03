@@ -1978,14 +1978,14 @@ class Game {
       ctx.shadowColor = weaponColor;
       ctx.shadowBlur = 12;
       ctx.beginPath();
-      ctx.arc(0, 0, 26, 0, Math.PI * 2);
+      ctx.arc(0, 0, 52, 0, Math.PI * 2);
       ctx.stroke();
 
       ctx.fillStyle = "#f4f7ff";
       ctx.font = "bold 14px Segoe UI";
       const glyph = getWeaponGlyph(weaponId);
-      const tipX = 26 * Math.cos(0.2 * (1 - swingProgress));
-      const tipY = 26 * Math.sin(0.2 * (1 - swingProgress));
+      const tipX = 52 * Math.cos(0.2 * (1 - swingProgress));
+      const tipY = 52 * Math.sin(0.2 * (1 - swingProgress));
       ctx.fillText(glyph, tipX, tipY);
       ctx.restore();
     }
