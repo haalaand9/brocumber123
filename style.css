@@ -24,9 +24,9 @@ html, body {
   min-height: 100%;
   font-family: var(--font);
   background:
-    radial-gradient(circle at 18% 12%, rgba(121, 150, 180, 0.26), transparent 18%),
-    radial-gradient(circle at 78% 8%, rgba(117, 146, 199, 0.18), transparent 22%),
-    linear-gradient(180deg, #0a1118 0%, #04080d 35%, #020609 100%);
+    radial-gradient(circle at 20% 10%, rgba(110, 156, 206, 0.25), transparent 18%),
+    radial-gradient(circle at 75% 8%, rgba(255, 143, 70, 0.12), transparent 20%),
+    linear-gradient(180deg, #0a1620 0%, #0b1117 20%, #111b22 45%, #060b0f 100%);
   color: #edf3ff;
   image-rendering: pixelated;
   text-rendering: geometricPrecision;
@@ -46,22 +46,22 @@ body::before {
   position: fixed;
   inset: 0;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01)),
+    linear-gradient(180deg, rgba(190, 218, 255, 0.04), rgba(0, 0, 0, 0)),
     repeating-linear-gradient(
       90deg,
-      rgba(255, 255, 255, 0.013) 0,
-      rgba(255, 255, 255, 0.013) 1px,
+      rgba(131, 158, 175, 0.09) 0,
+      rgba(131, 158, 175, 0.09) 1px,
       transparent 1px,
       transparent 4px
     ),
     repeating-linear-gradient(
       180deg,
-      rgba(255, 255, 255, 0.012) 0,
-      rgba(255, 255, 255, 0.012) 1px,
+      rgba(162, 170, 185, 0.08) 0,
+      rgba(162, 170, 185, 0.08) 1px,
       transparent 1px,
       transparent 5px
     );
-  opacity: 0.8;
+  opacity: 0.9;
   pointer-events: none;
   mix-blend-mode: screen;
 }
