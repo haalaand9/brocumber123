@@ -1979,8 +1979,14 @@ class Game {
       ctx.lineWidth = 5;
       ctx.shadowColor = weaponColor;
       ctx.shadowBlur = 12;
+
       ctx.beginPath();
-      ctx.arc(0, 0, 52, 0, Math.PI * 2);
+      ctx.arc(0, 0, 52, -Math.PI / 2, Math.PI / 2);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(52, 0);
       ctx.stroke();
 
       ctx.fillStyle = "#f4f7ff";
