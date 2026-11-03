@@ -99,8 +99,27 @@ const WEAPONS = [
   { id: "wand", name: "Wand", category: "Medieval", type: "ranged", damage: 4, reload: 0.89, price: 11, color: "#d6d0ff", description: "Magic projectile attack.", attack: "wand", range: 25 }
 ];
 
+const REALISTIC_MELEE_RANGES = {
+  suitcase: 32,
+  sword: 58,
+  crowbar: 44,
+  spear: 82,
+  torch: 40,
+  wrench: 42,
+  stick: 36,
+  drill: 52,
+  pillow: 24,
+  dumbbell: 34,
+  belt: 28,
+  hockey_stick: 64
+};
+
 WEAPONS.forEach((weapon) => {
-  weapon.range = weapon.range ?? 25;
+  if (weapon.type === "melee") {
+    weapon.range = REALISTIC_MELEE_RANGES[weapon.id] ?? 40;
+  } else {
+    weapon.range = weapon.range ?? 25;
+  }
 });
 
 const UPGRADE_DEFS = [
@@ -219,8 +238,10 @@ function getWeaponById(id) {
 
 function getWeaponRange(weaponId) {
   const weapon = getWeaponById(weaponId);
-  if (!weapon) return 52;
-  if (weapon.type === "melee") return 52;
+  if (!weapon) return 40;
+  if (weapon.type === "melee") {
+    return Number.isFinite(weapon.range) ? weapon.range : 40;
+  }
   return Number.isFinite(weapon.range) ? weapon.range : 25;
 }
 
@@ -1971,6 +1992,7 @@ class Game {
     if (player.meleeSwing > 0) {
       const weaponId = player.meleeSwingWeapon || "sword";
       const weaponColor = getWeaponById(weaponId).color || "#dfe6ff";
+      const meleeRange = getWeaponRange(weaponId);
       const swingProgress = 1 - player.meleeSwing / 0.2;
 
       ctx.save();
@@ -1981,19 +2003,19 @@ class Game {
       ctx.shadowBlur = 12;
 
       ctx.beginPath();
-      ctx.arc(0, 0, 52, -Math.PI / 2, Math.PI / 2);
+      ctx.arc(0, 0, meleeRange, -Math.PI / 2, Math.PI / 2);
       ctx.stroke();
 
       ctx.beginPath();
       ctx.moveTo(0, 0);
-      ctx.lineTo(52, 0);
+      ctx.lineTo(meleeRange, 0);
       ctx.stroke();
 
       ctx.fillStyle = "#f4f7ff";
       ctx.font = "bold 14px Segoe UI";
       const glyph = getWeaponGlyph(weaponId);
-      const tipX = 52 * Math.cos(0.2 * (1 - swingProgress));
-      const tipY = 52 * Math.sin(0.2 * (1 - swingProgress));
+      const tipX = meleeRange * Math.cos(0.2 * (1 - swingProgress));
+      const tipY = meleeRange * Math.sin(0.2 * (1 - swingProgress));
       ctx.fillText(glyph, tipX, tipY);
       ctx.restore();
     }
