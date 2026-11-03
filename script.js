@@ -219,6 +219,8 @@ function getWeaponById(id) {
 
 function getWeaponRange(weaponId) {
   const weapon = getWeaponById(weaponId);
+  if (!weapon) return 52;
+  if (weapon.type === "melee") return 52;
   return Number.isFinite(weapon.range) ? weapon.range : 25;
 }
 
@@ -1331,7 +1333,7 @@ class Game {
   performBiteAttack() {
     const player = this.player;
     if (!player) return;
-    const attackRange = 25;
+    const attackRange = 52;
     let target = null;
     let best = Infinity;
 
