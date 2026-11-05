@@ -318,52 +318,17 @@ const SETTINGS = {
   musicTrack: "none"
 };
 
-const YOUTUBE_LOFI_VIDEO_ID = "_jH2oTNRe7g";
-const YOUTUBE_JAZZ_VIDEO_ID = "SfODDoWtox8";
-const YOUTUBE_POP_VIDEO_ID = "Q3QfHMSTLfY";
-const YOUTUBE_ROCK_VIDEO_ID = "9bZkp7q19f0";
-
 const MUSIC_TRACKS = [
   { id: "none", name: "No music", interval: 0, lead: [], bass: [], wave: "sine", gain: 0.0 },
   {
-    id: "lofi",
-    name: "Lo-fi",
-    interval: 320,
-    lead: [174, 196, 220, 196, 174, 146.83, 196, 174, 146.83, 174, 196, 220],
-    bass: [87, 98, 110, 98, 87, 73.42, 98, 87, 73.42, 87, 98, 110],
-    wave: "sine",
-    gain: 0.024,
-    youtubeId: YOUTUBE_LOFI_VIDEO_ID
-  },
-  {
-    id: "sci_fi_rock",
-    name: "Rock",
-    interval: 180,
-    lead: [220, 246.94, 293.66, 246.94, 329.63, 293.66, 246.94, 220, 196, 246.94, 293.66, 329.63, 392, 329.63, 293.66, 246.94],
-    bass: [55, 73.42, 82.41, 73.42, 55, 73.42, 82.41, 73.42, 49, 65.41, 73.42, 82.41],
-    wave: "sawtooth",
-    gain: 0.032,
-    youtubeId: YOUTUBE_ROCK_VIDEO_ID
-  },
-  {
-    id: "pop",
-    name: "Pop",
+    id: "jazz_pop",
+    name: "Jazz Pop",
     interval: 220,
-    lead: [261.63, 329.63, 392, 329.63, 440, 392, 329.63, 293.66, 349.23, 392, 329.63, 293.66, 349.23, 440, 392, 329.63],
-    bass: [65.41, 65.41, 82.41, 82.41, 98, 98, 82.41, 73.42, 73.42, 82.41, 98, 98, 82.41, 65.41, 73.42, 82.41],
+    lead: [220, 261.63, 293.66, 329.63, 392, 329.63, 293.66, 261.63, 220, 246.94, 293.66, 349.23, 392, 349.23, 293.66, 261.63],
+    bass: [55, 73.42, 82.41, 73.42, 55, 73.42, 82.41, 73.42, 49, 65.41, 73.42, 82.41, 98, 82.41, 73.42, 65.41],
     wave: "triangle",
-    gain: 0.028,
-    youtubeId: YOUTUBE_POP_VIDEO_ID
-  },
-  {
-    id: "jazz",
-    name: "Jazz",
-    interval: 240,
-    lead: [146.83, 174, 220, 196, 174, 146.83, 220, 196, 174, 220, 174, 146.83, 220, 174, 196, 146.83],
-    bass: [73.42, 82.41, 98, 73.42, 82.41, 73.42, 98, 82.41, 73.42, 82.41, 98, 73.42, 65.41, 73.42, 82.41, 98],
-    wave: "triangle",
-    gain: 0.026,
-    youtubeId: YOUTUBE_JAZZ_VIDEO_ID
+    gain: 0.03,
+    youtubeId: null
   }
 ];
 
@@ -485,7 +450,7 @@ function playSelectedMusic(trackId) {
     return;
   }
 
-  if (["lofi", "jazz", "pop", "sci_fi_rock"].includes(track.id) && track.youtubeId && ui.youtubeMusicPlayer) {
+  if (track.id === "jazz_pop" && track.youtubeId && ui.youtubeMusicPlayer) {
     const embedUrl = `https://www.youtube.com/embed/${track.youtubeId}?autoplay=1&loop=1&playlist=${track.youtubeId}&controls=0&mute=1&rel=0&modestbranding=1&playsinline=1`;
     ui.youtubeMusicPlayer.src = embedUrl;
     return;
