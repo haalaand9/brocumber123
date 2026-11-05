@@ -315,7 +315,127 @@ const ENEMY_TYPES = {
 const SETTINGS = {
   soundVolume: 0.5,
   damageNumbers: true,
+  musicTrack: "none"
 };
+
+const MUSIC_TRACKS = [
+  { id: "none", name: "No music", interval: 0, pattern: [] },
+  { id: "arcade_pulse", name: "Arcade Pulse", interval: 220, pattern: [220, 277, 330, 277, 392, 330, 277, 349, 330, 277, 220, 196] },
+  { id: "midnight_drift", name: "Midnight Drift", interval: 260, pattern: [174, 196, 220, 196, 261.63, 220, 196, 174, 146.83, 174, 196, 220] },
+  { id: "neon_run", name: "Neon Run", interval: 200, pattern: [293.66, 349.23, 440, 349.23, 392, 349.23, 293.66, 349.23, 392, 440, 349.23, 293.66] },
+  { id: "boss_theme", name: "Boss Theme", interval: 180, pattern: [110, 164.81, 146.83, 123.47, 164.81, 220, 196, 164.81, 146.83, 196, 220, 164.81] }
+];
+
+const MUSIC_TRACK_KEY = "brocumber-music-track-v1";
+let musicAudioContext = null;
+let musicIntervalId = null;
+
+function getMusicTrackById(trackId) {
+  return MUSIC_TRACKS.find((track) => track.id === trackId) || MUSIC_TRACKS[0];
+}
+
+function saveSelectedMusic(trackId) {
+  try {
+    localStorage.setItem(MUSIC_TRACK_KEY, trackId);
+  } catch (error) {
+    // Ignore storage failures.
+  }
+}
+
+function loadSelectedMusic() {
+  try {
+    const stored = localStorage.getItem(MUSIC_TRACK_KEY);
+    return stored ? getMusicTrackById(stored).id : "none";
+  } catch (error) {
+    return "none";
+  }
+}
+
+function ensureMusicAudioContext() {
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  if (!AudioCtx) return null;
+
+  if (!musicAudioContext) {
+    musicAudioContext = new AudioCtx();
+  }
+
+  if (musicAudioContext.state === "suspended") {
+    musicAudioContext.resume();
+  }
+
+  return musicAudioContext;
+}
+
+function playMusicNote(frequency, duration = 0.18, volume = 0.03, wave = "square") {
+  const audioContext = ensureMusicAudioContext();
+  if (!audioContext) return;
+
+  const oscillator = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+  oscillator.type = wave;
+  oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+
+  gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+  gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
+
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+
+  oscillator.start();
+  oscillator.stop(audioContext.currentTime + duration);
+}
+
+function stopMusic() {
+  if (musicIntervalId) {
+    clearInterval(musicIntervalId);
+    musicIntervalId = null;
+  }
+}
+
+function renderMusicOptions() {
+  const list = ui.musicSelectionList;
+  if (!list) return;
+
+  list.innerHTML = MUSIC_TRACKS.map((track) => `
+    <button type="button" class="music-option ${SETTINGS.musicTrack === track.id ? "active" : ""}" data-track-id="${track.id}">
+      ${track.name}
+    </button>
+  `).join("");
+
+  list.querySelectorAll(".music-option").forEach((button) => {
+    button.addEventListener("click", () => {
+      const selectedTrackId = button.dataset.trackId;
+      SETTINGS.musicTrack = selectedTrackId;
+      saveSelectedMusic(selectedTrackId);
+      renderMusicOptions();
+      playSelectedMusic(selectedTrackId);
+    });
+  });
+}
+
+function playSelectedMusic(trackId) {
+  const track = getMusicTrackById(trackId);
+  SETTINGS.musicTrack = track.id;
+  stopMusic();
+
+  if (track.id === "none") {
+    return;
+  }
+
+  const ctx = ensureMusicAudioContext();
+  if (!ctx) return;
+
+  let patternIndex = 0;
+  const playNextStep = () => {
+    const frequency = track.pattern[patternIndex % track.pattern.length] || 220;
+    const type = patternIndex % 2 === 0 ? "square" : "triangle";
+    playMusicNote(frequency, 0.18, 0.025, type);
+    patternIndex += 1;
+  };
+
+  playNextStep();
+  musicIntervalId = setInterval(playNextStep, track.interval);
+}
 
 const screenIds = {
   menu: document.getElementById("menuScreen"),
@@ -343,6 +463,7 @@ const ui = {
   finalCoinsText: document.getElementById("finalCoinsText"),
   soundVolumeInput: document.getElementById("soundVolumeInput"),
   damageNumbersToggle: document.getElementById("damageNumbersToggle"),
+  musicSelectionList: document.getElementById("musicSelectionList"),
   characterGrid: document.getElementById("characterGrid"),
   selectedCharacterInfo: document.getElementById("selectedCharacterInfo"),
   weaponChoiceList: document.getElementById("weaponChoiceList"),
@@ -1355,6 +1476,8 @@ class Game {
     ui.damageNumbersToggle.addEventListener("change", (event) => {
       SETTINGS.damageNumbers = event.target.checked;
     });
+
+    renderMusicOptions();
   }
 
   bindKeyboard() {
@@ -2359,8 +2482,10 @@ class Game {
 }
 
 function initGame() {
+  SETTINGS.musicTrack = loadSelectedMusic();
   ui.soundVolumeInput.value = String(SETTINGS.soundVolume);
   ui.damageNumbersToggle.checked = SETTINGS.damageNumbers;
+  renderMusicOptions();
   renderCharacterSelectionUI();
   setScreen("menu");
 }

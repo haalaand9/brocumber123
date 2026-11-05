@@ -588,6 +588,39 @@ button.ghost.danger {
   justify-content: flex-start;
 }
 
+.music-panel {
+  margin-top: 1.25rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid rgba(171, 189, 214, 0.18);
+}
+
+.music-panel h3 {
+  margin: 0 0 0.8rem;
+}
+
+.music-selection-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.6rem;
+}
+
+.music-option {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  color: #edf3ff;
+  border-radius: 12px;
+  padding: 0.7rem 0.55rem;
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+}
+
+.music-option:hover,
+.music-option.active {
+  border-color: rgba(128, 255, 137, 0.7);
+  background: rgba(31, 58, 36, 0.72);
+  transform: translateY(-1px);
+}
+
 input[type="range"] {
   width: 180px;
 }
