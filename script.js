@@ -319,11 +319,43 @@ const SETTINGS = {
 };
 
 const MUSIC_TRACKS = [
-  { id: "none", name: "No music", interval: 0, pattern: [] },
-  { id: "lofi", name: "Lo-fi", interval: 310, pattern: [174, 196, 220, 196, 174, 146.83, 196, 174, 146.83, 174, 196, 220] },
-  { id: "sci_fi_rock", name: "Sci-Fi Rock", interval: 170, pattern: [220, 246.94, 293.66, 246.94, 329.63, 293.66, 246.94, 220, 196, 246.94, 293.66, 329.63] },
-  { id: "pop", name: "Pop", interval: 220, pattern: [261.63, 329.63, 392, 329.63, 440, 392, 329.63, 293.66, 349.23, 392, 329.63, 293.66] },
-  { id: "jazz", name: "Jazz", interval: 260, pattern: [146.83, 174, 220, 196, 174, 146.83, 220, 196, 174, 220, 174, 146.83] }
+  { id: "none", name: "No music", interval: 0, lead: [], bass: [], wave: "sine", gain: 0.0 },
+  {
+    id: "lofi",
+    name: "Lo-fi",
+    interval: 320,
+    lead: [174, 196, 220, 196, 174, 146.83, 196, 174, 146.83, 174, 196, 220],
+    bass: [87, 98, 110, 98, 87, 73.42, 98, 87, 73.42, 87, 98, 110],
+    wave: "sine",
+    gain: 0.024
+  },
+  {
+    id: "sci_fi_rock",
+    name: "Sci-Fi Rock",
+    interval: 180,
+    lead: [220, 246.94, 293.66, 246.94, 329.63, 293.66, 246.94, 220, 196, 246.94, 293.66, 329.63, 392, 329.63, 293.66, 246.94],
+    bass: [55, 73.42, 82.41, 73.42, 55, 73.42, 82.41, 73.42, 49, 65.41, 73.42, 82.41],
+    wave: "sawtooth",
+    gain: 0.032
+  },
+  {
+    id: "pop",
+    name: "Pop",
+    interval: 220,
+    lead: [261.63, 329.63, 392, 329.63, 440, 392, 329.63, 293.66, 349.23, 392, 329.63, 293.66, 349.23, 440, 392, 329.63],
+    bass: [65.41, 65.41, 82.41, 82.41, 98, 98, 82.41, 73.42, 73.42, 82.41, 98, 98, 82.41, 65.41, 73.42, 82.41],
+    wave: "triangle",
+    gain: 0.028
+  },
+  {
+    id: "jazz",
+    name: "Jazz",
+    interval: 240,
+    lead: [146.83, 174, 220, 196, 174, 146.83, 220, 196, 174, 220, 174, 146.83, 220, 174, 196, 146.83],
+    bass: [73.42, 82.41, 98, 73.42, 82.41, 73.42, 98, 82.41, 73.42, 82.41, 98, 73.42, 65.41, 73.42, 82.41, 98],
+    wave: "triangle",
+    gain: 0.026
+  }
 ];
 
 const MUSIC_TRACK_KEY = "brocumber-music-track-v1";
@@ -385,6 +417,19 @@ function playMusicNote(frequency, duration = 0.18, volume = 0.03, wave = "square
   oscillator.stop(audioContext.currentTime + duration);
 }
 
+function playMusicAccent(trackId, stepIndex) {
+  const track = getMusicTrackById(trackId);
+  if (!track || !track.bass || !track.bass.length) return;
+
+  const bassFrequency = track.bass[stepIndex % track.bass.length];
+  const waveform = track.id === "sci_fi_rock" ? "sawtooth" : track.id === "pop" ? "square" : "triangle";
+  const accentVolume = track.id === "sci_fi_rock" ? 0.02 : 0.015;
+
+  if (stepIndex % 2 === 0) {
+    playMusicNote(bassFrequency / 2, 0.22, accentVolume, waveform);
+  }
+}
+
 function stopMusic() {
   if (musicIntervalId) {
     clearInterval(musicIntervalId);
@@ -432,9 +477,24 @@ function playSelectedMusic(trackId) {
 
   let patternIndex = 0;
   const playNextStep = () => {
-    const frequency = track.pattern[patternIndex % track.pattern.length] || 220;
-    const type = patternIndex % 2 === 0 ? "square" : "triangle";
-    playMusicNote(frequency, 0.18, 0.025, type);
+    const leadFrequency = track.lead[patternIndex % track.lead.length] || 220;
+    const type = track.wave || (patternIndex % 2 === 0 ? "square" : "triangle");
+    const gain = typeof track.gain === "number" ? track.gain : 0.02;
+
+    playMusicNote(leadFrequency, track.id === "lofi" ? 0.22 : 0.18, gain, type);
+
+    if (track.bass && track.bass.length && patternIndex % 2 === 1) {
+      playMusicAccent(track.id, patternIndex);
+    }
+
+    if (track.id === "jazz" && patternIndex % 3 === 0) {
+      playMusicNote(leadFrequency * 1.5, 0.14, gain * 0.7, "triangle");
+    }
+
+    if (track.id === "pop" && patternIndex % 4 === 0) {
+      playMusicNote(leadFrequency * 0.5, 0.12, gain * 0.8, "square");
+    }
+
     patternIndex += 1;
   };
 
