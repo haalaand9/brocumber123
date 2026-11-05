@@ -604,6 +604,23 @@ button.ghost.danger {
   gap: 0.6rem;
 }
 
+.youtube-music-player-wrapper {
+  position: fixed;
+  left: -9999px;
+  top: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.youtube-music-player-wrapper iframe {
+  width: 1px;
+  height: 1px;
+  border: 0;
+}
+
 .music-option {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--line);
