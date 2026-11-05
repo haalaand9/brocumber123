@@ -621,6 +621,38 @@ button.ghost.danger {
   transform: translateY(-1px);
 }
 
+.music-soundbar {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.22rem;
+  height: 18px;
+  margin-top: 0.85rem;
+  padding: 0.3rem 0.4rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(171, 189, 214, 0.18);
+}
+
+.music-soundbar span {
+  display: block;
+  width: 6px;
+  border-radius: 4px 4px 0 0;
+  background: linear-gradient(180deg, #dff7ff 0%, #8fe7b3 100%);
+  animation: sound-bar 0.9s ease-in-out infinite alternate;
+}
+
+.music-soundbar span:nth-child(1) { height: 35%; animation-delay: 0.1s; }
+.music-soundbar span:nth-child(2) { height: 58%; animation-delay: 0.2s; }
+.music-soundbar span:nth-child(3) { height: 80%; animation-delay: 0.3s; }
+.music-soundbar span:nth-child(4) { height: 62%; animation-delay: 0.4s; }
+.music-soundbar span:nth-child(5) { height: 92%; animation-delay: 0.5s; }
+.music-soundbar span:nth-child(6) { height: 48%; animation-delay: 0.6s; }
+
+@keyframes sound-bar {
+  0% { transform: scaleY(0.5); opacity: 0.6; }
+  100% { transform: scaleY(1); opacity: 1; }
+}
+
 input[type="range"] {
   width: 180px;
 }

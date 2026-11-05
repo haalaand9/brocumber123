@@ -320,10 +320,10 @@ const SETTINGS = {
 
 const MUSIC_TRACKS = [
   { id: "none", name: "No music", interval: 0, pattern: [] },
-  { id: "arcade_pulse", name: "Arcade Pulse", interval: 220, pattern: [220, 277, 330, 277, 392, 330, 277, 349, 330, 277, 220, 196] },
-  { id: "midnight_drift", name: "Midnight Drift", interval: 260, pattern: [174, 196, 220, 196, 261.63, 220, 196, 174, 146.83, 174, 196, 220] },
-  { id: "neon_run", name: "Neon Run", interval: 200, pattern: [293.66, 349.23, 440, 349.23, 392, 349.23, 293.66, 349.23, 392, 440, 349.23, 293.66] },
-  { id: "boss_theme", name: "Boss Theme", interval: 180, pattern: [110, 164.81, 146.83, 123.47, 164.81, 220, 196, 164.81, 146.83, 196, 220, 164.81] }
+  { id: "lofi", name: "Lo-fi", interval: 310, pattern: [174, 196, 220, 196, 174, 146.83, 196, 174, 146.83, 174, 196, 220] },
+  { id: "sci_fi_rock", name: "Sci-Fi Rock", interval: 170, pattern: [220, 246.94, 293.66, 246.94, 329.63, 293.66, 246.94, 220, 196, 246.94, 293.66, 329.63] },
+  { id: "pop", name: "Pop", interval: 220, pattern: [261.63, 329.63, 392, 329.63, 440, 392, 329.63, 293.66, 349.23, 392, 329.63, 293.66] },
+  { id: "jazz", name: "Jazz", interval: 260, pattern: [146.83, 174, 220, 196, 174, 146.83, 220, 196, 174, 220, 174, 146.83] }
 ];
 
 const MUSIC_TRACK_KEY = "brocumber-music-track-v1";
@@ -401,6 +401,11 @@ function renderMusicOptions() {
       ${track.name}
     </button>
   `).join("");
+
+  const soundBar = document.querySelector(".music-soundbar");
+  if (soundBar) {
+    soundBar.style.opacity = SETTINGS.musicTrack === "none" ? "0.35" : "1";
+  }
 
   list.querySelectorAll(".music-option").forEach((button) => {
     button.addEventListener("click", () => {
