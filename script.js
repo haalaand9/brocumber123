@@ -73,6 +73,90 @@ function getCharacterGlyph(characterId) {
   return CHARACTER_GLYPHS[characterId] || "🥒";
 }
 
+function getPixelCucumberSprite(characterId) {
+  const palette = {
+    base: "#7fe069",
+    mid: "#9ef38a",
+    dark: "#2d6a32",
+    eye: "#1e2d20",
+    accent: "#dfe8ff",
+    gold: "#f7d77a",
+    red: "#ff8f6d",
+    blue: "#8bc7ff",
+    purple: "#d3a2ff",
+    grey: "#b0bcc9",
+    orange: "#ffb15e"
+  };
+
+  const variations = {
+    normal: { body: palette.base, accent: palette.dark, extra: palette.mid },
+    ranger: { body: palette.blue, accent: palette.dark, extra: palette.mid },
+    brawler: { body: palette.orange, accent: palette.dark, extra: palette.mid },
+    well_rounded: { body: palette.base, accent: palette.dark, extra: palette.gold },
+    crazy: { body: palette.red, accent: palette.dark, extra: palette.mid },
+    old: { body: palette.grey, accent: palette.dark, extra: palette.mid },
+    young: { body: palette.base, accent: palette.dark, extra: palette.mid },
+    baby: { body: palette.mid, accent: palette.dark, extra: palette.base },
+    robot: { body: palette.grey, accent: palette.dark, extra: palette.blue },
+    soldier: { body: palette.base, accent: palette.dark, extra: palette.blue },
+    jockey: { body: palette.base, accent: palette.dark, extra: palette.mid },
+    king: { body: palette.gold, accent: palette.dark, extra: palette.mid },
+    graduate_student: { body: palette.base, accent: palette.dark, extra: palette.blue },
+    mom: { body: palette.base, accent: palette.dark, extra: palette.red },
+    god: { body: palette.gold, accent: palette.dark, extra: palette.mid },
+    bounty_hunter: { body: palette.base, accent: palette.dark, extra: palette.gold },
+    dog: { body: palette.mid, accent: palette.dark, extra: palette.base },
+    cat: { body: palette.mid, accent: palette.dark, extra: palette.orange },
+    inventor: { body: palette.base, accent: palette.dark, extra: palette.blue },
+    shapeshifter: { body: palette.base, accent: palette.dark, extra: palette.purple },
+    athlete: { body: palette.base, accent: palette.dark, extra: palette.mid },
+    prince: { body: palette.gold, accent: palette.dark, extra: palette.mid },
+    princess: { body: palette.purple, accent: palette.dark, extra: palette.mid },
+    guardian: { body: palette.base, accent: palette.dark, extra: palette.blue },
+    teen: { body: palette.base, accent: palette.dark, extra: palette.mid }
+  };
+
+  const theme = variations[characterId] || variations.normal;
+  const accessoryMap = {
+    normal: "",
+    ranger: '<rect x="3" y="1" width="2" height="2" fill="#dfe8ff"/><rect x="11" y="1" width="2" height="2" fill="#dfe8ff"/><rect x="6" y="0" width="4" height="1" fill="#dfe8ff"/>',
+    brawler: '<rect x="2" y="5" width="2" height="2" fill="#1e2d20"/><rect x="12" y="5" width="2" height="2" fill="#1e2d20"/><rect x="4" y="0" width="8" height="1" fill="#1e2d20"/>',
+    well_rounded: '<rect x="4" y="0" width="8" height="2" fill="#f7d77a"/><rect x="6" y="4" width="4" height="2" fill="#f7d77a"/>',
+    crazy: '<rect x="2" y="0" width="2" height="2" fill="#f7d77a"/><rect x="12" y="0" width="2" height="2" fill="#f7d77a"/><rect x="7" y="2" width="2" height="2" fill="#f7d77a"/>',
+    old: '<rect x="3" y="3" width="3" height="2" fill="#1e2d20"/><rect x="10" y="3" width="3" height="2" fill="#1e2d20"/><rect x="5" y="0" width="6" height="1" fill="#dfe8ff"/>',
+    baby: '<rect x="5" y="0" width="6" height="2" fill="#dfe8ff"/><rect x="7" y="9" width="2" height="2" fill="#ff8f6d"/>',
+    robot: '<rect x="6" y="0" width="4" height="2" fill="#8bc7ff"/><rect x="7" y="-1" width="2" height="2" fill="#8bc7ff"/><rect x="4" y="3" width="8" height="1" fill="#8bc7ff"/>',
+    soldier: '<rect x="3" y="0" width="10" height="2" fill="#8bc7ff"/><rect x="5" y="2" width="6" height="1" fill="#dfe8ff"/>',
+    king: '<rect x="3" y="0" width="10" height="2" fill="#f7d77a"/><rect x="5" y="-1" width="6" height="2" fill="#f7d77a"/><rect x="4" y="2" width="8" height="1" fill="#f7d77a"/>',
+    graduate_student: '<rect x="4" y="1" width="8" height="2" fill="#8bc7ff"/><rect x="6" y="5" width="4" height="2" fill="#dfe8ff"/>',
+    mom: '<rect x="2" y="3" width="12" height="1" fill="#ff8f6d"/><rect x="5" y="0" width="6" height="2" fill="#ff8f6d"/>',
+    god: '<rect x="3" y="0" width="10" height="2" fill="#f7d77a"/><rect x="0" y="2" width="2" height="2" fill="#f7d77a"/><rect x="14" y="2" width="2" height="2" fill="#f7d77a"/>',
+    bounty_hunter: '<rect x="1" y="3" width="2" height="2" fill="#f7d77a"/><rect x="13" y="3" width="2" height="2" fill="#f7d77a"/><rect x="6" y="0" width="4" height="2" fill="#f7d77a"/>',
+    dog: '<rect x="5" y="0" width="2" height="2" fill="#dfe8ff"/><rect x="9" y="0" width="2" height="2" fill="#dfe8ff"/><rect x="3" y="4" width="2" height="2" fill="#dfe8ff"/><rect x="11" y="4" width="2" height="2" fill="#dfe8ff"/>',
+    cat: '<rect x="5" y="0" width="2" height="2" fill="#ffb15e"/><rect x="9" y="0" width="2" height="2" fill="#ffb15e"/><rect x="4" y="4" width="2" height="2" fill="#ffb15e"/><rect x="10" y="4" width="2" height="2" fill="#ffb15e"/>',
+    inventor: '<rect x="5" y="1" width="6" height="1" fill="#8bc7ff"/><rect x="4" y="3" width="8" height="2" fill="#8bc7ff"/>',
+    shapeshifter: '<rect x="3" y="0" width="10" height="2" fill="#d3a2ff"/><rect x="7" y="3" width="2" height="2" fill="#d3a2ff"/>',
+    athlete: '<rect x="2" y="5" width="3" height="2" fill="#1e2d20"/><rect x="11" y="5" width="3" height="2" fill="#1e2d20"/><rect x="4" y="0" width="8" height="1" fill="#1e2d20"/>',
+    prince: '<rect x="3" y="0" width="10" height="2" fill="#f7d77a"/><rect x="6" y="2" width="4" height="2" fill="#f7d77a"/>',
+    princess: '<rect x="4" y="1" width="8" height="2" fill="#d3a2ff"/><rect x="5" y="0" width="6" height="1" fill="#f7d77a"/>',
+    guardian: '<rect x="2" y="2" width="12" height="2" fill="#8bc7ff"/><rect x="5" y="0" width="6" height="1" fill="#8bc7ff"/>',
+    teen: '<rect x="4" y="0" width="8" height="2" fill="#dfe8ff"/><rect x="3" y="5" width="10" height="1" fill="#1e2d20"/>'
+  };
+
+  return `
+    <svg class="pixel-character-sprite" viewBox="0 0 16 16" aria-hidden="true">
+      <rect x="3" y="2" width="10" height="10" fill="${theme.body}"/>
+      <rect x="2" y="3" width="12" height="1" fill="${theme.mid}"/>
+      <rect x="5" y="4" width="2" height="2" fill="${theme.accent}"/>
+      <rect x="9" y="4" width="2" height="2" fill="${theme.accent}"/>
+      <rect x="6" y="8" width="4" height="2" fill="${theme.dark}"/>
+      <rect x="4" y="11" width="8" height="1" fill="${theme.dark}"/>
+      <rect x="7" y="1" width="2" height="1" fill="${theme.accent}"/>
+      ${accessoryMap[characterId] || accessoryMap.normal}
+    </svg>
+  `;
+}
+
 const WEAPONS = [
   { id: "pistol", name: "Pistol", category: "Gun", type: "ranged", damage: 10, reload: 0.95, price: 12, color: "#d7f0ff", description: "Reliable sidearm with steady shots.", attack: "projectile", range: 25 },
   { id: "revolver", name: "Revolver", category: "Gun", type: "ranged", damage: 7, reload: 0.84, price: 10, color: "#dfd5ff", description: "Fast, compact revolver.", attack: "projectile", range: 25 },
@@ -300,7 +384,7 @@ function createCharacterCard(character) {
       <span class="character-name">${character.name}</span>
       <span class="character-badge">${character.badge}</span>
     </div>
-    <div class="character-art">${getCharacterGlyph(character.id)}</div>
+    <div class="character-art pixel-art-shell">${getPixelCucumberSprite(character.id)}</div>
     <small>${character.description}</small>
     <span class="restrictions">${character.restrictions}</span>
     <small>${formatCharacterBonusText(character.id)}</small>
@@ -361,7 +445,7 @@ function renderCharacterSelectionUI() {
   const character = getCharacterById(selectedCharacterId);
   ui.selectedCharacterInfo.innerHTML = `
     <div class="selected-character-identity">
-      <div class="selected-character-icon">${getCharacterGlyph(character.id)}</div>
+      <div class="selected-character-icon pixel-art-shell">${getPixelCucumberSprite(character.id)}</div>
       <div class="selected-character-copy">
         <h4>${character.name}</h4>
         <strong>${character.badge}</strong>
