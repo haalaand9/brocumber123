@@ -222,7 +222,7 @@ const WEAPONS = [
   { id: "suitcase", name: "Suitcase", category: "Other", type: "melee", damage: 4, reload: 0.57, price: 8, color: "#d2c7a6", description: "A surprising melee finisher.", attack: "melee", range: 25 },
   { id: "sword", name: "Sword", category: "Medieval", type: "melee", damage: 14, reload: 0.76, price: 16, color: "#dfe6ff", description: "Classic steel swing.", attack: "melee", range: 25 },
   { id: "crowbar", name: "Crowbar", category: "Other", type: "melee", damage: 12, reload: 0.85, price: 15, color: "#dcd7b3", description: "Cracks through armor.", attack: "melee", range: 25 },
-  { id: "minigun", name: "Minigun", category: "Gun", type: "ranged", damage: 4, reload: 0.12, price: 22, color: "#cfe6ff", description: "Very fast spray of bullets.", attack: "projectile", range: 25 },
+  { id: "minigun", name: "Minigun", category: "Gun", type: "ranged", damage: 4, reload: 0.12, price: 22, color: "#cfe6ff", description: "Very fast spray of bullets.", attack: "projectile", range: 12.5 },
   { id: "shotgun", name: "Shotgun", category: "Gun", type: "ranged", damage: 15, reload: 1.12, price: 18, color: "#f2d0aa", description: "Fires a spread of pellets.", attack: "shotgun", range: 25 },
   { id: "spear", name: "Spear", category: "Medieval", type: "melee", damage: 6, reload: 1.01, price: 13, color: "#d2e7d8", description: "Long reach with strong thrusts.", attack: "melee", range: 25 },
   { id: "torch", name: "Torch", category: "Medieval", type: "melee", damage: 8, reload: 0.75, price: 12, color: "#ffb76b", description: "Burning melee weapon.", attack: "melee", range: 25 },
