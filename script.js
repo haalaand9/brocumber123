@@ -353,6 +353,7 @@ const ui = {
   settingsButton: document.getElementById("settingsButton"),
   startGameButton: document.getElementById("startGameButton"),
   backToMenuFromCharacters: document.getElementById("backToMenuFromCharacters"),
+  resetCharacterStatsButton: document.getElementById("resetCharacterStatsButton"),
   backToMenuFromSettings: document.getElementById("backToMenuFromSettings"),
   rerollButton: document.getElementById("rerollButton"),
   continueButton: document.getElementById("continueButton"),
@@ -1312,6 +1313,11 @@ class Game {
     });
 
     ui.backToMenuFromCharacters.addEventListener("click", () => setScreen("menu"));
+    ui.resetCharacterStatsButton.addEventListener("click", () => {
+      resetCharacterProgress();
+      renderCharacterSelection();
+      setStatus("Character stats reset.");
+    });
     ui.backToMenuFromSettings.addEventListener("click", () => setScreen("menu"));
 
     ui.pauseButton.addEventListener("click", () => {

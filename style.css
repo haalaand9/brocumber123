@@ -219,8 +219,19 @@ h1 {
   padding: 1rem 1.3rem 0;
 }
 
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .topbar h2 {
   margin: 0;
+}
+
+button.ghost.danger {
+  border-color: rgba(255, 95, 109, 0.7);
+  color: #ffd6db;
 }
 
 .character-grid {
