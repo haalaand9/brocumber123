@@ -314,7 +314,7 @@ const ENEMY_TYPES = {
 
 const SETTINGS = {
   soundVolume: 0.5,
-  musicVolume: 0.5,
+  musicVolume: 0.9,
   damageNumbers: true,
   musicTrack: "none"
 };
