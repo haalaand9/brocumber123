@@ -435,26 +435,12 @@ function formatCharacterBonusText(characterId) {
 
 const CHARACTER_STATS_KEY = "brocumber-character-progress-v1";
 
-function makeSeededCharacterStats(characterId) {
-  const seed = Array.from(characterId).reduce((sum, char) => sum + char.charCodeAt(0), 0);
-  const games = 8 + (seed % 18);
-  const winRate = 18 + (seed % 52);
-  const wins = Math.round((games * winRate) / 100);
-  const farthestRound = 2 + (seed % 11);
-
-  return { games, wins, farthestRound };
-}
-
 function getCharacterStats(characterId) {
   try {
     const stored = JSON.parse(localStorage.getItem(CHARACTER_STATS_KEY) || "{}");
-    if (!stored[characterId]) {
-      stored[characterId] = makeSeededCharacterStats(characterId);
-      localStorage.setItem(CHARACTER_STATS_KEY, JSON.stringify(stored));
-    }
-    return stored[characterId];
+    return stored[characterId] || null;
   } catch (error) {
-    return makeSeededCharacterStats(characterId);
+    return null;
   }
 }
 
@@ -469,7 +455,7 @@ function saveCharacterStats(characterId, stats) {
 }
 
 function updateCharacterRunStats(characterId, roundReached, didWin) {
-  const current = getCharacterStats(characterId);
+  const current = getCharacterStats(characterId) || { games: 0, wins: 0, farthestRound: 0 };
   const next = {
     games: (current.games || 0) + 1,
     wins: (current.wins || 0) + (didWin ? 1 : 0),
@@ -480,13 +466,26 @@ function updateCharacterRunStats(characterId, roundReached, didWin) {
 }
 
 function getWinRateText(characterId) {
-  const { games, wins } = getCharacterStats(characterId);
-  if (!games) return "0%";
-  return `${Math.round((wins / games) * 100)}%`;
+  const stats = getCharacterStats(characterId);
+  if (!stats || !stats.games) return "—";
+  return `${Math.round((stats.wins / stats.games) * 100)}%`;
+}
+
+function getCharacterStatSummary(characterId) {
+  const stats = getCharacterStats(characterId);
+  if (!stats || !stats.games) {
+    return { games: "—", winRate: "—", farthestRound: "—" };
+  }
+
+  return {
+    games: String(stats.games),
+    winRate: getWinRateText(characterId),
+    farthestRound: String(stats.farthestRound)
+  };
 }
 
 function createCharacterCard(character) {
-  const stats = getCharacterStats(character.id);
+  const stats = getCharacterStatSummary(character.id);
   const card = document.createElement("button");
   card.type = "button";
   card.className = "character-card" + (character.id === selectedCharacterId ? " selected" : "");
@@ -501,7 +500,7 @@ function createCharacterCard(character) {
     <small>${formatCharacterBonusText(character.id)}</small>
     <div class="character-stat-strip">
       <div class="character-stat"><strong>${stats.games}</strong><span>Games</span></div>
-      <div class="character-stat"><strong>${getWinRateText(character.id)}</strong><span>Win</span></div>
+      <div class="character-stat"><strong>${stats.winRate}</strong><span>Win</span></div>
       <div class="character-stat"><strong>${stats.farthestRound}</strong><span>Best</span></div>
     </div>
   `;
@@ -559,7 +558,7 @@ function renderCharacterSelectionUI() {
   cards.forEach((card) => ui.characterGrid.appendChild(card));
 
   const character = getCharacterById(selectedCharacterId);
-  const stats = getCharacterStats(character.id);
+  const stats = getCharacterStatSummary(character.id);
   ui.selectedCharacterInfo.innerHTML = `
     <div class="selected-character-identity">
       <div class="selected-character-icon pixel-art-shell">${getPixelCucumberSprite(character.id)}</div>
@@ -573,7 +572,7 @@ function renderCharacterSelectionUI() {
     </div>
     <div class="character-stat-grid">
       <div class="character-stat"><strong>${stats.games}</strong><span>Games</span></div>
-      <div class="character-stat"><strong>${getWinRateText(character.id)}</strong><span>Win Rate</span></div>
+      <div class="character-stat"><strong>${stats.winRate}</strong><span>Win Rate</span></div>
       <div class="character-stat"><strong>${stats.farthestRound}</strong><span>Farthest</span></div>
     </div>
   `;
