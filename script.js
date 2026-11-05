@@ -157,6 +157,64 @@ function getPixelCucumberSprite(characterId) {
   `;
 }
 
+function drawPixelCharacterAvatar(ctx, characterId, colors) {
+  ctx.save();
+  ctx.translate(0, 0);
+
+  ctx.fillStyle = colors.body;
+  ctx.fillRect(-9, -15, 18, 18);
+
+  ctx.fillStyle = colors.accent;
+  ctx.fillRect(-8, -12, 16, 3);
+  ctx.fillRect(-7, -18, 14, 6);
+
+  ctx.fillStyle = colors.extra;
+  ctx.fillRect(-15, -2, 5, 8);
+  ctx.fillRect(10, -2, 5, 8);
+  ctx.fillRect(-7, 10, 5, 9);
+  ctx.fillRect(2, 10, 5, 9);
+
+  ctx.fillStyle = "#0f1718";
+  ctx.fillRect(-4, -15, 3, 3);
+  ctx.fillRect(1, -15, 3, 3);
+  ctx.fillRect(-3, -9, 6, 2);
+
+  if (characterId === "ranger") {
+    ctx.fillStyle = "#dfe8ff";
+    ctx.fillRect(-11, -18, 3, 2);
+    ctx.fillRect(8, -18, 3, 2);
+  }
+  if (characterId === "king" || characterId === "prince" || characterId === "princess") {
+    ctx.fillStyle = "#f7d77a";
+    ctx.fillRect(-8, -21, 16, 2);
+  }
+  if (characterId === "guardian") {
+    ctx.fillStyle = "#8bc7ff";
+    ctx.fillRect(-12, -8, 24, 2);
+  }
+  if (characterId === "robot") {
+    ctx.fillStyle = "#8bc7ff";
+    ctx.fillRect(-4, -19, 8, 2);
+  }
+  if (characterId === "dog" || characterId === "cat") {
+    ctx.fillStyle = colors.extra;
+    ctx.fillRect(-11, -13, 3, 3);
+    ctx.fillRect(8, -13, 3, 3);
+  }
+  if (characterId === "god") {
+    ctx.fillStyle = "#f7d77a";
+    ctx.fillRect(-12, -2, 2, 2);
+    ctx.fillRect(10, -2, 2, 2);
+  }
+  if (characterId === "bounty_hunter") {
+    ctx.fillStyle = "#f7d77a";
+    ctx.fillRect(-4, -8, 2, 2);
+    ctx.fillRect(2, -8, 2, 2);
+  }
+
+  ctx.restore();
+}
+
 const WEAPONS = [
   { id: "pistol", name: "Pistol", category: "Gun", type: "ranged", damage: 10, reload: 0.95, price: 12, color: "#d7f0ff", description: "Reliable sidearm with steady shots.", attack: "projectile", range: 25 },
   { id: "revolver", name: "Revolver", category: "Gun", type: "ranged", damage: 7, reload: 0.84, price: 10, color: "#dfd5ff", description: "Fast, compact revolver.", attack: "projectile", range: 25 },
@@ -375,7 +433,60 @@ function formatCharacterBonusText(characterId) {
   return effects.length ? effects.join(" • ") : "No bonus";
 }
 
+const CHARACTER_STATS_KEY = "brocumber-character-progress-v1";
+
+function makeSeededCharacterStats(characterId) {
+  const seed = Array.from(characterId).reduce((sum, char) => sum + char.charCodeAt(0), 0);
+  const games = 8 + (seed % 18);
+  const winRate = 18 + (seed % 52);
+  const wins = Math.round((games * winRate) / 100);
+  const farthestRound = 2 + (seed % 11);
+
+  return { games, wins, farthestRound };
+}
+
+function getCharacterStats(characterId) {
+  try {
+    const stored = JSON.parse(localStorage.getItem(CHARACTER_STATS_KEY) || "{}");
+    if (!stored[characterId]) {
+      stored[characterId] = makeSeededCharacterStats(characterId);
+      localStorage.setItem(CHARACTER_STATS_KEY, JSON.stringify(stored));
+    }
+    return stored[characterId];
+  } catch (error) {
+    return makeSeededCharacterStats(characterId);
+  }
+}
+
+function saveCharacterStats(characterId, stats) {
+  try {
+    const stored = JSON.parse(localStorage.getItem(CHARACTER_STATS_KEY) || "{}");
+    stored[characterId] = stats;
+    localStorage.setItem(CHARACTER_STATS_KEY, JSON.stringify(stored));
+  } catch (error) {
+    // Ignore storage failures in private browsing or unsupported environments.
+  }
+}
+
+function updateCharacterRunStats(characterId, roundReached, didWin) {
+  const current = getCharacterStats(characterId);
+  const next = {
+    games: (current.games || 0) + 1,
+    wins: (current.wins || 0) + (didWin ? 1 : 0),
+    farthestRound: Math.max(current.farthestRound || 0, roundReached || 0)
+  };
+  saveCharacterStats(characterId, next);
+  return next;
+}
+
+function getWinRateText(characterId) {
+  const { games, wins } = getCharacterStats(characterId);
+  if (!games) return "0%";
+  return `${Math.round((wins / games) * 100)}%`;
+}
+
 function createCharacterCard(character) {
+  const stats = getCharacterStats(character.id);
   const card = document.createElement("button");
   card.type = "button";
   card.className = "character-card" + (character.id === selectedCharacterId ? " selected" : "");
@@ -388,6 +499,11 @@ function createCharacterCard(character) {
     <small>${character.description}</small>
     <span class="restrictions">${character.restrictions}</span>
     <small>${formatCharacterBonusText(character.id)}</small>
+    <div class="character-stat-strip">
+      <div class="character-stat"><strong>${stats.games}</strong><span>Games</span></div>
+      <div class="character-stat"><strong>${getWinRateText(character.id)}</strong><span>Win</span></div>
+      <div class="character-stat"><strong>${stats.farthestRound}</strong><span>Best</span></div>
+    </div>
   `;
   card.addEventListener("click", () => {
     selectedCharacterId = character.id;
@@ -443,6 +559,7 @@ function renderCharacterSelectionUI() {
   cards.forEach((card) => ui.characterGrid.appendChild(card));
 
   const character = getCharacterById(selectedCharacterId);
+  const stats = getCharacterStats(character.id);
   ui.selectedCharacterInfo.innerHTML = `
     <div class="selected-character-identity">
       <div class="selected-character-icon pixel-art-shell">${getPixelCucumberSprite(character.id)}</div>
@@ -453,6 +570,11 @@ function renderCharacterSelectionUI() {
         <p><span>Perk:</span> ${character.perk}</p>
         <p><span>Restriction:</span> ${character.restrictions}</p>
       </div>
+    </div>
+    <div class="character-stat-grid">
+      <div class="character-stat"><strong>${stats.games}</strong><span>Games</span></div>
+      <div class="character-stat"><strong>${getWinRateText(character.id)}</strong><span>Win Rate</span></div>
+      <div class="character-stat"><strong>${stats.farthestRound}</strong><span>Farthest</span></div>
     </div>
   `;
 
@@ -561,6 +683,10 @@ class Player {
       this.inventory = this.weapons.map((entry) => ({ id: entry.id, level: entry.level }));
       this.updateStatsFromEquipped();
       return true;
+    }
+
+    if (this.weapons.length >= MAX_WEAPONS) {
+      return false;
     }
 
     this.weapons.push({ id: weaponId, level: 1, cooldown: 0 });
@@ -1317,11 +1443,14 @@ class Game {
     this.gameOver = true;
     this.state = "gameover";
     this.paused = true;
+    const didWin = this.wave >= 3;
+    updateCharacterRunStats(selectedCharacterId, this.wave, didWin);
     ui.finalWaveText.textContent = String(this.wave);
     ui.finalKillsText.textContent = String(this.player.kills);
     ui.finalCoinsText.textContent = String(this.player.coins);
     ui.gameOverOverlay.classList.remove("hidden");
     setStatus("You were defeated.");
+    renderCharacterSelection();
   }
 
   calculateWaveGoal(waveNumber) {
@@ -2132,207 +2261,7 @@ class Game {
     };
 
     const colors = costumeMap[player.characterId] || costumeMap.normal;
-    ctx.fillStyle = colors.body;
-    ctx.beginPath();
-    ctx.ellipse(0, 0, 15, 17, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.fillStyle = colors.accent;
-    ctx.fillRect(-9, -12, 18, 4);
-
-    ctx.fillStyle = colors.extra;
-    ctx.fillRect(-5, -5, 3, 3);
-    ctx.fillRect(2, -5, 3, 3);
-    ctx.beginPath();
-    ctx.arc(0, 2, 7, 0, Math.PI);
-    ctx.strokeStyle = colors.extra;
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    if (player.characterId === "ranger") {
-      ctx.fillStyle = "#d9c66d";
-      ctx.fillRect(-9, -18, 18, 4);
-      ctx.fillRect(-11, -15, 22, 2);
-      ctx.fillRect(-13, 12, 5, 10);
-      ctx.fillRect(8, 12, 5, 10);
-    }
-
-    if (player.characterId === "brawler") {
-      ctx.fillStyle = "#a66d39";
-      ctx.fillRect(-16, 2, 4, 10);
-      ctx.fillRect(12, 2, 4, 10);
-      ctx.fillRect(-18, -8, 4, 15);
-      ctx.fillRect(14, -8, 4, 15);
-    }
-
-    if (player.characterId === "robot") {
-      ctx.strokeStyle = "#7f8ea3";
-      ctx.lineWidth = 2;
-      ctx.strokeRect(-11, -11, 22, 22);
-      ctx.fillStyle = "#f7ff96";
-      ctx.fillRect(-5, -2, 10, 4);
-    }
-
-    if (player.characterId === "soldier") {
-      ctx.fillStyle = "#335a3d";
-      ctx.fillRect(-12, -18, 24, 6);
-      ctx.fillStyle = "#c7f2ac";
-      ctx.fillRect(-3, -4, 6, 6);
-    }
-
-    if (player.characterId === "well_rounded") {
-      ctx.fillStyle = "#d6f7a3";
-      ctx.fillRect(-15, -18, 30, 4);
-      ctx.fillStyle = "#1d3d38";
-      ctx.fillRect(-6, -6, 12, 3);
-    }
-
-    if (player.characterId === "old") {
-      ctx.fillStyle = "#c9d8ea";
-      ctx.fillRect(-13, -19, 26, 4);
-      ctx.fillRect(-14, -2, 28, 3);
-      ctx.strokeStyle = "#7b8ca0";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(-17, 12);
-      ctx.lineTo(-9, 22);
-      ctx.moveTo(17, 12);
-      ctx.lineTo(9, 22);
-      ctx.stroke();
-    }
-
-    if (player.characterId === "king" || player.characterId === "prince") {
-      ctx.fillStyle = "#ffd95e";
-      ctx.beginPath();
-      ctx.moveTo(-10, -18);
-      ctx.lineTo(-6, -25);
-      ctx.lineTo(-2, -18);
-      ctx.lineTo(2, -25);
-      ctx.lineTo(6, -18);
-      ctx.lineTo(10, -18);
-      ctx.closePath();
-      ctx.fill();
-    }
-
-    if (player.characterId === "princess") {
-      ctx.fillStyle = "#ffd6fa";
-      ctx.beginPath();
-      ctx.arc(0, -19, 5, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillRect(-8, -17, 16, 3);
-    }
-
-    if (player.characterId === "athlete") {
-      ctx.fillStyle = "#ebeef5";
-      ctx.fillRect(-12, -15, 24, 8);
-      ctx.fillStyle = "#2b7d5c";
-      ctx.fillRect(-8, -14, 16, 3);
-    }
-
-    if (player.characterId === "guardian") {
-      ctx.strokeStyle = "#96d7ff";
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.arc(0, 0, 18, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.fillStyle = "rgba(150, 215, 255, 0.2)";
-      ctx.beginPath();
-      ctx.arc(0, 0, 24, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    if (player.characterId === "inventor") {
-      ctx.strokeStyle = "#b6e7ff";
-      ctx.lineWidth = 2;
-      ctx.strokeRect(-6, -7, 12, 6);
-      ctx.fillStyle = "#dff7ff";
-      ctx.fillRect(-2, -8, 4, 4);
-    }
-
-    if (player.characterId === "god") {
-      ctx.strokeStyle = "rgba(255, 240, 160, 0.9)";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(0, 0, 22, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-
-    if (player.characterId === "mom") {
-      ctx.fillStyle = "#f5d5ce";
-      ctx.fillRect(-10, -18, 20, 7);
-      ctx.fillRect(-14, 10, 28, 5);
-    }
-
-    if (player.characterId === "baby") {
-      ctx.fillStyle = "#f4f6d0";
-      ctx.fillRect(-8, -20, 16, 5);
-      ctx.fillStyle = "#daca9c";
-      ctx.fillRect(-12, 12, 7, 11);
-      ctx.fillRect(5, 12, 7, 11);
-    }
-
-    if (player.characterId === "bounty_hunter") {
-      ctx.fillStyle = "#f1d5a8";
-      ctx.fillRect(-10, -21, 20, 4);
-      ctx.fillStyle = "#7a4b1f";
-      ctx.fillRect(-14, 14, 6, 10);
-      ctx.fillRect(8, 14, 6, 10);
-    }
-
-    if (player.characterId === "cat" || (player.characterId === "shapeshifter" && player.form === "cat")) {
-      ctx.fillStyle = "#7aca79";
-      ctx.beginPath();
-      ctx.moveTo(-8, -20);
-      ctx.lineTo(-12, -12);
-      ctx.lineTo(-4, -15);
-      ctx.closePath();
-      ctx.fill();
-      ctx.beginPath();
-      ctx.moveTo(8, -20);
-      ctx.lineTo(12, -12);
-      ctx.lineTo(4, -15);
-      ctx.closePath();
-      ctx.fill();
-    }
-
-    if (player.characterId === "dog" || (player.characterId === "shapeshifter" && player.form === "dog")) {
-      ctx.fillStyle = "#6c8d76";
-      ctx.beginPath();
-      ctx.moveTo(-8, -20);
-      ctx.lineTo(-4, -12);
-      ctx.lineTo(-12, -15);
-      ctx.closePath();
-      ctx.fill();
-      ctx.beginPath();
-      ctx.moveTo(8, -20);
-      ctx.lineTo(4, -12);
-      ctx.lineTo(12, -15);
-      ctx.closePath();
-      ctx.fill();
-    }
-
-    if (player.characterId === "graduate_student") {
-      ctx.fillStyle = "#dce4ff";
-      ctx.fillRect(-10, -18, 20, 4);
-    }
-
-    if (player.characterId === "young") {
-      ctx.fillStyle = "#f1f7ff";
-      ctx.fillRect(-13, -16, 26, 4);
-    }
-
-    if (player.characterId === "crazy") {
-      ctx.fillStyle = "#ffb75d";
-      ctx.fillRect(-8, -22, 16, 5);
-      ctx.fillRect(-4, -26, 8, 4);
-    }
-
-    if (player.characterId === "teen") {
-      ctx.fillStyle = "#f7fcff";
-      ctx.fillRect(-13, -18, 26, 5);
-      ctx.fillStyle = "#2d6d8d";
-      ctx.fillRect(-5, 12, 10, 9);
-    }
+    drawPixelCharacterAvatar(ctx, player.characterId, colors);
 
     ctx.restore();
   }
