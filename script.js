@@ -435,6 +435,14 @@ function formatCharacterBonusText(characterId) {
 
 const CHARACTER_STATS_KEY = "brocumber-character-progress-v1";
 
+function resetCharacterProgress() {
+  try {
+    localStorage.setItem(CHARACTER_STATS_KEY, JSON.stringify({}));
+  } catch (error) {
+    // Ignore storage failures in private browsing or unsupported environments.
+  }
+}
+
 function getCharacterStats(characterId) {
   try {
     const stored = JSON.parse(localStorage.getItem(CHARACTER_STATS_KEY) || "{}");
