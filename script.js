@@ -1426,6 +1426,9 @@ class Game {
     this.inGame = false;
     this.rerollCost = 12;
     this.gameOver = false;
+    this.cucumbers = [];
+    this.lastMenuCucumberSpawn = 0;
+    this.lastMenuTimestamp = performance.now();
 
     this.bindUI();
     this.bindKeyboard();
@@ -1564,10 +1567,14 @@ class Game {
   }
 
   startMenuLoop() {
-    const renderMenu = () => {
+    const renderMenu = (timestamp) => {
+      const delta = Math.min(40, timestamp - this.lastMenuTimestamp || 16);
+      this.lastMenuTimestamp = timestamp;
+      this.updateMenuCucumbers(delta);
       this.renderMenuBackground();
       this.animationId = requestAnimationFrame(renderMenu);
     };
+    this.lastMenuTimestamp = performance.now();
     this.animationId = requestAnimationFrame(renderMenu);
   }
 
@@ -2196,6 +2203,76 @@ class Game {
     ui.shopCoinsText.textContent = String(Math.floor(this.player.coins));
   }
 
+  updateMenuCucumbers(delta) {
+    this.lastMenuCucumberSpawn += delta;
+    if (this.lastMenuCucumberSpawn > 420) {
+      this.lastMenuCucumberSpawn = 0;
+      const x = 30 + Math.random() * (ARENA_WIDTH - 60);
+      this.cucumbers.push({
+        x,
+        y: -30,
+        speed: 1.2 + Math.random() * 2.2,
+        drift: (Math.random() - 0.5) * 0.5,
+        rotation: (Math.random() - 0.5) * 0.7,
+        scale: 0.7 + Math.random() * 0.7
+      });
+    }
+
+    for (let i = this.cucumbers.length - 1; i >= 0; i -= 1) {
+      const cucumber = this.cucumbers[i];
+      cucumber.y += cucumber.speed * (delta / 16.66);
+      cucumber.x += cucumber.drift * (delta / 16.66);
+      cucumber.rotation += 0.01 * (delta / 16.66);
+
+      if (cucumber.y > ARENA_HEIGHT + 30 || cucumber.x < -40 || cucumber.x > ARENA_WIDTH + 40) {
+        this.cucumbers.splice(i, 1);
+      }
+    }
+  }
+
+  drawMenuCucumber(ctx, cucumber) {
+    ctx.save();
+    ctx.translate(cucumber.x, cucumber.y);
+    ctx.rotate(cucumber.rotation);
+    ctx.scale(cucumber.scale, cucumber.scale);
+
+    ctx.fillStyle = "#9be76d";
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 20, 12, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = "#6ccf56";
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 16, 8, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = "rgba(20, 60, 18, 0.8)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(-7, -3);
+    ctx.lineTo(8, 0);
+    ctx.stroke();
+
+    ctx.fillStyle = "rgba(22, 80, 28, 0.7)";
+    for (let i = -9; i <= 9; i += 4) {
+      ctx.fillRect(i, -4, 2, 8);
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(15, 0);
+    ctx.lineTo(23, 0);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(11, -5);
+    ctx.lineTo(18, -9);
+    ctx.moveTo(11, 5);
+    ctx.lineTo(18, 9);
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
   renderMenuBackground() {
     const ctx = this.ctx;
     ctx.clearRect(0, 0, ARENA_WIDTH, ARENA_HEIGHT);
@@ -2264,6 +2341,8 @@ class Game {
       ctx.lineTo(x, ARENA_HEIGHT);
       ctx.stroke();
     }
+
+    this.cucumbers.forEach((cucumber) => this.drawMenuCucumber(ctx, cucumber));
   }
 
   render() {
