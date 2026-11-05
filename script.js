@@ -314,6 +314,7 @@ const ENEMY_TYPES = {
 
 const SETTINGS = {
   soundVolume: 0.5,
+  musicVolume: 0.5,
   damageNumbers: true,
   musicTrack: "none"
 };
@@ -374,14 +375,17 @@ function ensureMusicAudioContext() {
 
 function playMusicNote(frequency, duration = 0.18, volume = 0.03, wave = "square") {
   const audioContext = ensureMusicAudioContext();
-  if (!audioContext) return;
+  if (!audioContext || SETTINGS.musicTrack === "none") return;
+
+  const finalVolume = Math.max(0, Math.min(1, (volume || 0) * (SETTINGS.musicVolume || 0)));
+  if (finalVolume <= 0.0001) return;
 
   const oscillator = audioContext.createOscillator();
   const gainNode = audioContext.createGain();
   oscillator.type = wave;
   oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
 
-  gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+  gainNode.gain.setValueAtTime(finalVolume, audioContext.currentTime);
   gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
 
   oscillator.connect(gainNode);
@@ -511,6 +515,7 @@ const ui = {
   finalKillsText: document.getElementById("finalKillsText"),
   finalCoinsText: document.getElementById("finalCoinsText"),
   soundVolumeInput: document.getElementById("soundVolumeInput"),
+  musicVolumeInput: document.getElementById("musicVolumeInput"),
   damageNumbersToggle: document.getElementById("damageNumbersToggle"),
   musicSelectionList: document.getElementById("musicSelectionList"),
   youtubeMusicPlayer: document.getElementById("youtubeMusicPlayer"),
@@ -1521,6 +1526,13 @@ class Game {
     ui.soundVolumeInput.addEventListener("input", (event) => {
       SETTINGS.soundVolume = Number(event.target.value);
       playAudioTick("shop");
+    });
+
+    ui.musicVolumeInput.addEventListener("input", (event) => {
+      SETTINGS.musicVolume = Number(event.target.value);
+      if (SETTINGS.musicTrack !== "none") {
+        playSelectedMusic(SETTINGS.musicTrack);
+      }
     });
 
     ui.damageNumbersToggle.addEventListener("change", (event) => {
@@ -2534,6 +2546,7 @@ class Game {
 function initGame() {
   SETTINGS.musicTrack = loadSelectedMusic();
   ui.soundVolumeInput.value = String(SETTINGS.soundVolume);
+  ui.musicVolumeInput.value = String(SETTINGS.musicVolume);
   ui.damageNumbersToggle.checked = SETTINGS.damageNumbers;
   renderMusicOptions();
   renderCharacterSelectionUI();
