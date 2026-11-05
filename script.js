@@ -314,7 +314,7 @@ const ENEMY_TYPES = {
 
 const SETTINGS = {
   soundVolume: 0.5,
-  musicVolume: 0.9,
+  musicVolume: 90,
   damageNumbers: true,
   musicTrack: "none"
 };
@@ -377,7 +377,8 @@ function playMusicNote(frequency, duration = 0.18, volume = 0.03, wave = "square
   const audioContext = ensureMusicAudioContext();
   if (!audioContext || SETTINGS.musicTrack === "none") return;
 
-  const finalVolume = Math.max(0, Math.min(1, (volume || 0) * (SETTINGS.musicVolume || 0)));
+  const musicScale = Math.max(0, Math.min(1, (SETTINGS.musicVolume || 0) / 100));
+  const finalVolume = Math.max(0, Math.min(1, (volume || 0) * musicScale));
   if (finalVolume <= 0.0001) return;
 
   const oscillator = audioContext.createOscillator();
