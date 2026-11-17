@@ -49,7 +49,7 @@ Damage values and reload intervals are kept as provided. Reload is measured in s
 | Pistol | Ranged | 10 | 0.95s |
 | Revolver | Ranged | 7 | 0.84s |
 | Flamethrower | Ranged | 14 | 1.06s |
-| Minigun | Ranged | 4 | 0.12s |
+| Minigun | Ranged | 0.75 | 0.12s |
 | Shotgun | Ranged | 15 | 1.12s |
 | AK-47 | Ranged | 14 | 0.76s |
 | Rocket Launcher | Ranged | 18 | 1.34s |
