@@ -2721,7 +2721,6 @@ class Game {
     const colors = costumeMap[player.characterId] || costumeMap.normal;
     drawPixelCharacterAvatar(ctx, player.characterId, colors);
 
-    const facingAngle = Math.atan2(player.facingY || 0, player.facingX || 1);
     const equippedRangeWeapon = player.weapons.find((entry) => getWeaponById(entry.id).type === "ranged");
     if (equippedRangeWeapon) {
       const weapon = getWeaponById(equippedRangeWeapon.id);
