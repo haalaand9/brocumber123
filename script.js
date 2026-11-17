@@ -75,21 +75,22 @@ function getCharacterGlyph(characterId) {
 
 function getRangedWeaponSprite(weaponId) {
   const base = {
-    pistol: { body: "#dfeafc", barrel: "#a8c0d9", length: 18, width: 5, grip: "#6f7d8d" },
-    revolver: { body: "#dfd5ff", barrel: "#b8a8dc", length: 17, width: 6, grip: "#6f6190" },
-    shotgun: { body: "#f2d0aa", barrel: "#c38949", length: 20, width: 8, grip: "#7b5b2c" },
-    minigun: { body: "#dfeafc", barrel: "#b9c7d9", length: 24, width: 5, grip: "#6a7d93" },
-    ak47: { body: "#d9e9ff", barrel: "#a6bddf", length: 22, width: 6, grip: "#687a95" },
-    rocket_launcher: { body: "#ffbf7a", barrel: "#d38738", length: 28, width: 9, grip: "#7b4d17" },
-    wand: { body: "#d6d0ff", barrel: "#9f95e5", length: 16, width: 4, grip: "#6057a9" },
-    speaker: { body: "#d2dcff", barrel: "#a3b2df", length: 18, width: 7, grip: "#7583b8" }
+    pistol: { body: "#dfeafc", barrel: "#a8c0d9", length: 18, width: 5, grip: "#6f7d8d", style: "pistol" },
+    revolver: { body: "#dfd5ff", barrel: "#b8a8dc", length: 17, width: 7, grip: "#6f6190", style: "revolver" },
+    shotgun: { body: "#f2d0aa", barrel: "#c38949", length: 22, width: 9, grip: "#7b5b2c", style: "shotgun" },
+    minigun: { body: "#dfeafc", barrel: "#b9c7d9", length: 26, width: 5, grip: "#6a7d93", style: "minigun" },
+    ak47: { body: "#d9e9ff", barrel: "#a6bddf", length: 24, width: 6, grip: "#687a95", style: "rifle" },
+    rocket_launcher: { body: "#ffbf7a", barrel: "#d38738", length: 30, width: 10, grip: "#7b4d17", style: "rocket" },
+    wand: { body: "#d6d0ff", barrel: "#9f95e5", length: 16, width: 4, grip: "#6057a9", style: "wand" },
+    speaker: { body: "#d2dcff", barrel: "#a3b2df", length: 18, width: 7, grip: "#7583b8", style: "speaker" }
   };
-  return base[weaponId] || { body: "#dfeafc", barrel: "#a8c0d9", length: 18, width: 5, grip: "#6f7d8d" };
+  return base[weaponId] || { body: "#dfeafc", barrel: "#a8c0d9", length: 18, width: 5, grip: "#6f7d8d", style: "pistol" };
 }
 
 function getWeaponMuzzle(weaponId, originX, originY, angle) {
   const weapon = getRangedWeaponSprite(weaponId);
-  const length = weapon.length + (weaponId === "rocket_launcher" ? 10 : 0) + (weaponId === "minigun" ? 6 : 0);
+  const extraLength = weapon.style === "rocket" ? 8 : weapon.style === "minigun" ? 7 : weapon.style === "shotgun" ? 5 : 0;
+  const length = weapon.length + extraLength;
   return {
     x: originX + Math.cos(angle) * length,
     y: originY + Math.sin(angle) * length
@@ -100,33 +101,84 @@ function drawRangedWeaponSprite(ctx, weaponId, facingAngle) {
   const sprite = getRangedWeaponSprite(weaponId);
   ctx.save();
   ctx.rotate(facingAngle);
-  ctx.translate(10, 0);
+  ctx.translate(8, 0);
 
-  ctx.fillStyle = sprite.grip;
-  ctx.fillRect(6, -3, 7, 6);
-
-  ctx.fillStyle = sprite.body;
-  ctx.fillRect(12, -sprite.width / 2, sprite.length, sprite.width);
-
-  ctx.fillStyle = sprite.barrel;
-  ctx.fillRect(12, -Math.max(2, sprite.width / 2 - 1), sprite.length, Math.max(2, sprite.width - 2));
-
-  if (weaponId === "minigun") {
+  if (sprite.style === "pistol") {
+    ctx.fillStyle = sprite.grip;
+    ctx.fillRect(2, -3, 8, 6);
+    ctx.fillStyle = sprite.body;
+    ctx.fillRect(9, -4, 14, 8);
     ctx.fillStyle = sprite.barrel;
-    ctx.fillRect(15, -8, 10, 2.5);
-    ctx.fillRect(15, 5, 10, 2.5);
-  }
-
-  if (weaponId === "rocket_launcher") {
-    ctx.fillStyle = "rgba(0,0,0,0.2)";
-    ctx.fillRect(22, -4, 8, 8);
-    ctx.fillStyle = "#f9d9a5";
-    ctx.fillRect(27, -3, 5, 6);
-  }
-
-  if (weaponId === "shotgun") {
+    ctx.fillRect(18, -2.5, 12, 5);
     ctx.fillStyle = "rgba(0,0,0,0.18)";
-    ctx.fillRect(14, -6, 10, 12);
+    ctx.fillRect(14, -1, 3, 2);
+  } else if (sprite.style === "revolver") {
+    ctx.fillStyle = sprite.grip;
+    ctx.fillRect(2, -4, 8, 8);
+    ctx.fillStyle = sprite.body;
+    ctx.beginPath();
+    ctx.arc(15, 0, 9, -Math.PI / 2, Math.PI * 1.5);
+    ctx.fill();
+    ctx.fillStyle = sprite.barrel;
+    ctx.fillRect(21, -2.8, 12, 5.6);
+  } else if (sprite.style === "shotgun") {
+    ctx.fillStyle = sprite.grip;
+    ctx.fillRect(0, -5, 10, 10);
+    ctx.fillStyle = sprite.body;
+    ctx.fillRect(10, -7, 14, 14);
+    ctx.fillStyle = sprite.barrel;
+    ctx.fillRect(21, -5, 16, 10);
+    ctx.fillStyle = "rgba(0,0,0,0.18)";
+    ctx.fillRect(15, -10, 8, 20);
+  } else if (sprite.style === "minigun") {
+    ctx.fillStyle = sprite.grip;
+    ctx.fillRect(3, -5, 10, 10);
+    ctx.fillStyle = sprite.body;
+    ctx.fillRect(10, -4, 12, 8);
+    ctx.fillStyle = sprite.barrel;
+    ctx.fillRect(20, -10, 16, 2.5);
+    ctx.fillRect(20, 7.5, 16, 2.5);
+    ctx.fillRect(20, -2, 16, 4);
+  } else if (sprite.style === "rifle") {
+    ctx.fillStyle = sprite.grip;
+    ctx.fillRect(3, -4, 8, 8);
+    ctx.fillStyle = sprite.body;
+    ctx.fillRect(10, -6, 18, 12);
+    ctx.fillStyle = sprite.barrel;
+    ctx.fillRect(25, -3, 16, 6);
+    ctx.fillStyle = "rgba(0,0,0,0.18)";
+    ctx.fillRect(14, -8, 5, 16);
+  } else if (sprite.style === "rocket") {
+    ctx.fillStyle = sprite.grip;
+    ctx.fillRect(1, -8, 12, 16);
+    ctx.fillStyle = sprite.body;
+    ctx.fillRect(12, -9, 18, 18);
+    ctx.fillStyle = sprite.barrel;
+    ctx.fillRect(28, -5, 18, 10);
+    ctx.fillStyle = "#f9d9a5";
+    ctx.fillRect(43, -3, 6, 6);
+  } else if (sprite.style === "wand") {
+    ctx.fillStyle = sprite.grip;
+    ctx.fillRect(5, -2, 5, 4);
+    ctx.strokeStyle = sprite.barrel;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(10, 0);
+    ctx.lineTo(28, 0);
+    ctx.stroke();
+    ctx.fillStyle = "#e2d8ff";
+    ctx.beginPath();
+    ctx.arc(29, 0, 4, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (sprite.style === "speaker") {
+    ctx.fillStyle = sprite.grip;
+    ctx.fillRect(2, -7, 8, 14);
+    ctx.fillStyle = sprite.body;
+    ctx.fillRect(10, -10, 16, 20);
+    ctx.fillStyle = sprite.barrel;
+    ctx.fillRect(24, -2, 12, 4);
+    ctx.fillStyle = "rgba(0,0,0,0.18)";
+    ctx.fillRect(13, -7, 10, 14);
   }
 
   ctx.restore();
