@@ -1036,9 +1036,18 @@ class Player {
       effective.maxHealth = 10;
     }
 
+    const weaponStatBonus = this.weapons.reduce((totals, weaponEntry) => {
+      const weapon = getWeaponById(weaponEntry.id);
+      const stackWeight = weaponEntry.level || 1;
+
+      if (weapon.type === "melee") totals.melee += weapon.damage * stackWeight;
+      if (weapon.type === "ranged") totals.ranged += weapon.damage * stackWeight;
+      return totals;
+    }, { melee: 0, ranged: 0 });
+
     effective.maxHealth += total.maxHealth;
-    effective.meleeDamage += total.meleeDamage;
-    effective.rangedDamage += total.rangedDamage;
+    effective.meleeDamage += total.meleeDamage + weaponStatBonus.melee;
+    effective.rangedDamage += total.rangedDamage + weaponStatBonus.ranged;
     effective.armor += total.armor;
     effective.speed += total.speed;
     effective.luck += total.luck;
