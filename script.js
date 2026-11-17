@@ -1046,7 +1046,7 @@ class Enemy {
     this.maxHp = this.baseHp;
     this.hp = this.maxHp;
     this.size = template.size;
-    this.speed = template.speed * (1 + (wave - 1) * 0.08);
+    this.speed = 3 + (wave - 1) + (template.speed - 20) * 0.02;
     this.damage = damageByTier[waveTier];
     this.coins = template.coins;
     this.color = template.color;
