@@ -73,6 +73,65 @@ function getCharacterGlyph(characterId) {
   return CHARACTER_GLYPHS[characterId] || "🥒";
 }
 
+function getRangedWeaponSprite(weaponId) {
+  const base = {
+    pistol: { body: "#dfeafc", barrel: "#a8c0d9", length: 18, width: 5, grip: "#6f7d8d" },
+    revolver: { body: "#dfd5ff", barrel: "#b8a8dc", length: 17, width: 6, grip: "#6f6190" },
+    shotgun: { body: "#f2d0aa", barrel: "#c38949", length: 20, width: 8, grip: "#7b5b2c" },
+    minigun: { body: "#dfeafc", barrel: "#b9c7d9", length: 24, width: 5, grip: "#6a7d93" },
+    ak47: { body: "#d9e9ff", barrel: "#a6bddf", length: 22, width: 6, grip: "#687a95" },
+    rocket_launcher: { body: "#ffbf7a", barrel: "#d38738", length: 28, width: 9, grip: "#7b4d17" },
+    wand: { body: "#d6d0ff", barrel: "#9f95e5", length: 16, width: 4, grip: "#6057a9" },
+    speaker: { body: "#d2dcff", barrel: "#a3b2df", length: 18, width: 7, grip: "#7583b8" }
+  };
+  return base[weaponId] || { body: "#dfeafc", barrel: "#a8c0d9", length: 18, width: 5, grip: "#6f7d8d" };
+}
+
+function getWeaponMuzzle(weaponId, originX, originY, angle) {
+  const weapon = getRangedWeaponSprite(weaponId);
+  const length = weapon.length + (weaponId === "rocket_launcher" ? 10 : 0) + (weaponId === "minigun" ? 6 : 0);
+  return {
+    x: originX + Math.cos(angle) * length,
+    y: originY + Math.sin(angle) * length
+  };
+}
+
+function drawRangedWeaponSprite(ctx, weaponId, facingAngle) {
+  const sprite = getRangedWeaponSprite(weaponId);
+  ctx.save();
+  ctx.rotate(facingAngle);
+  ctx.translate(10, 0);
+
+  ctx.fillStyle = sprite.grip;
+  ctx.fillRect(6, -3, 7, 6);
+
+  ctx.fillStyle = sprite.body;
+  ctx.fillRect(12, -sprite.width / 2, sprite.length, sprite.width);
+
+  ctx.fillStyle = sprite.barrel;
+  ctx.fillRect(12, -Math.max(2, sprite.width / 2 - 1), sprite.length, Math.max(2, sprite.width - 2));
+
+  if (weaponId === "minigun") {
+    ctx.fillStyle = sprite.barrel;
+    ctx.fillRect(15, -8, 10, 2.5);
+    ctx.fillRect(15, 5, 10, 2.5);
+  }
+
+  if (weaponId === "rocket_launcher") {
+    ctx.fillStyle = "rgba(0,0,0,0.2)";
+    ctx.fillRect(22, -4, 8, 8);
+    ctx.fillStyle = "#f9d9a5";
+    ctx.fillRect(27, -3, 5, 6);
+  }
+
+  if (weaponId === "shotgun") {
+    ctx.fillStyle = "rgba(0,0,0,0.18)";
+    ctx.fillRect(14, -6, 10, 12);
+  }
+
+  ctx.restore();
+}
+
 function getPixelCucumberSprite(characterId) {
   const palette = {
     base: "#7fe069",
@@ -1807,6 +1866,8 @@ class Game {
       return;
     }
 
+    const angle = target ? Math.atan2(target.y - player.y, target.x - player.x) : Math.atan2(player.facingY || 0, player.facingX || 1);
+    const muzzle = getWeaponMuzzle(weapon.id, player.x, player.y, angle);
     const damage = player.getEffectiveWeaponDamage(weapon);
 
     if (weapon.type === "melee") {
@@ -1815,11 +1876,10 @@ class Game {
     }
 
     if (weapon.attack === "projectile") {
-      const angle = target ? Math.atan2(target.y - player.y, target.x - player.x) : 0;
       const velocity = 300;
       this.projectiles.push(new Projectile({
-        x: player.x,
-        y: player.y,
+        x: muzzle.x,
+        y: muzzle.y,
         vx: Math.cos(angle) * velocity,
         vy: Math.sin(angle) * velocity,
         radius: weapon.id === "rocket_launcher" ? 5 : 4,
@@ -1836,12 +1896,12 @@ class Game {
     if (weapon.attack === "shotgun") {
       for (let pellet = 0; pellet < 5; pellet += 1) {
         const spread = -0.32 + pellet * 0.16;
-        const angle = target ? Math.atan2(target.y - player.y, target.x - player.x) + spread : 0;
+        const pelletAngle = angle + spread;
         this.projectiles.push(new Projectile({
-          x: player.x,
-          y: player.y,
-          vx: Math.cos(angle) * 280,
-          vy: Math.sin(angle) * 280,
+          x: muzzle.x,
+          y: muzzle.y,
+          vx: Math.cos(pelletAngle) * 280,
+          vy: Math.sin(pelletAngle) * 280,
           radius: 4,
           damage: damage * 0.9,
           color: weapon.color,
@@ -1854,12 +1914,11 @@ class Game {
     }
 
     if (weapon.attack === "flame") {
-      const angle = target ? Math.atan2(target.y - player.y, target.x - player.x) : 0;
       for (let i = -2; i <= 2; i += 1) {
         const spread = angle + i * 0.18;
         this.projectiles.push(new Projectile({
-          x: player.x,
-          y: player.y,
+          x: muzzle.x,
+          y: muzzle.y,
           vx: Math.cos(spread) * 180,
           vy: Math.sin(spread) * 180,
           radius: 6,
@@ -1875,8 +1934,8 @@ class Game {
 
     if (weapon.attack === "speaker") {
       this.projectiles.push(new Projectile({
-        x: player.x,
-        y: player.y,
+        x: muzzle.x,
+        y: muzzle.y,
         vx: 0,
         vy: 0,
         radius: 8,
@@ -1890,10 +1949,9 @@ class Game {
     }
 
     if (weapon.attack === "wand") {
-      const angle = target ? Math.atan2(target.y - player.y, target.x - player.x) : 0;
       this.projectiles.push(new Projectile({
-        x: player.x,
-        y: player.y,
+        x: muzzle.x,
+        y: muzzle.y,
         vx: Math.cos(angle) * 240,
         vy: Math.sin(angle) * 240,
         radius: 5,
@@ -1907,10 +1965,9 @@ class Game {
     }
 
     if (weapon.attack === "rocket") {
-      const angle = target ? Math.atan2(target.y - player.y, target.x - player.x) : 0;
       this.projectiles.push(new Projectile({
-        x: player.x,
-        y: player.y,
+        x: muzzle.x,
+        y: muzzle.y,
         vx: Math.cos(angle) * 250,
         vy: Math.sin(angle) * 250,
         radius: 7,
@@ -2611,6 +2668,13 @@ class Game {
 
     const colors = costumeMap[player.characterId] || costumeMap.normal;
     drawPixelCharacterAvatar(ctx, player.characterId, colors);
+
+    const facingAngle = Math.atan2(player.facingY || 0, player.facingX || 1);
+    const equippedRangeWeapon = player.weapons.find((entry) => getWeaponById(entry.id).type === "ranged");
+    if (equippedRangeWeapon) {
+      const weapon = getWeaponById(equippedRangeWeapon.id);
+      drawRangedWeaponSprite(ctx, weapon.id, facingAngle);
+    }
 
     ctx.restore();
   }
