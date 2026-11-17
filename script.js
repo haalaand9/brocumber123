@@ -330,6 +330,8 @@ function drawPixelCharacterAvatar(ctx, characterId, colors) {
   ctx.restore();
 }
 
+const SHOP_ONLY_WEAPONS = new Set(["flamethrower", "minigun"]);
+
 const WEAPONS = [
   { id: "pistol", name: "Pistol", category: "Gun", type: "ranged", damage: 10, reload: 0.95, price: 12, color: "#d7f0ff", description: "Reliable sidearm with steady shots.", attack: "projectile", range: 23 },
   { id: "revolver", name: "Revolver", category: "Gun", type: "ranged", damage: 7, reload: 0.84, price: 10, color: "#dfd5ff", description: "Fast, compact revolver.", attack: "projectile", range: 23 },
@@ -680,23 +682,44 @@ function getWeaponRange(weaponId) {
   return Number.isFinite(weapon.range) ? weapon.range : 23;
 }
 
-function weaponRestrictionFilter(characterId, weaponId) {
+function isShopOnlyWeapon(weaponId) {
+  return SHOP_ONLY_WEAPONS.has(weaponId);
+}
+
+function characterCanEquipWeapon(characterId, weaponId, allowShopOnly = false) {
   const weapon = getWeaponById(weaponId);
   const character = getCharacterById(characterId);
 
-  if (!character || character.id === "normal") {
-    return true;
+  if (!character || !weapon) {
+    return false;
   }
 
-  if (character.id === "ranger") return weapon.type === "ranged";
-  if (character.id === "brawler") return weapon.type === "melee";
-  if (character.id === "soldier") return weapon.category === "Gun";
-  if (character.id === "robot") return weapon.id === "drill";
-  if (character.id === "king") return weapon.category === "Medieval";
-  if (character.id === "athlete") return weapon.category === "Sports";
-  if (character.id === "prince" || character.id === "princess") return weapon.id === "wand";
+  if (isShopOnlyWeapon(weaponId) && !allowShopOnly) {
+    return false;
+  }
+
+  if (character.id === "normal") {
+    return !isShopOnlyWeapon(weaponId) || allowShopOnly;
+  }
+
+  if (character.id === "ranger") return weapon.type === "ranged" || (allowShopOnly && isShopOnlyWeapon(weaponId));
+  if (character.id === "brawler") return weapon.type === "melee" || (allowShopOnly && isShopOnlyWeapon(weaponId));
+  if (character.id === "soldier") return weapon.category === "Gun" || (allowShopOnly && isShopOnlyWeapon(weaponId));
+  if (character.id === "robot") return weapon.id === "drill" || (allowShopOnly && isShopOnlyWeapon(weaponId));
+  if (character.id === "king") return weapon.category === "Medieval" || (allowShopOnly && isShopOnlyWeapon(weaponId));
+  if (character.id === "athlete") return weapon.category === "Sports" || (allowShopOnly && isShopOnlyWeapon(weaponId));
+  if (character.id === "prince" || character.id === "princess") return weapon.id === "wand" || (allowShopOnly && isShopOnlyWeapon(weaponId));
   if (character.id === "dog" || character.id === "cat") return false;
+
   return true;
+}
+
+function weaponRestrictionFilter(characterId, weaponId) {
+  return characterCanEquipWeapon(characterId, weaponId, false);
+}
+
+function getShopWeaponPool(characterId) {
+  return WEAPONS.filter((weapon) => characterCanEquipWeapon(characterId, weapon.id, true));
 }
 
 function characterStatModifiers(characterId) {
@@ -1301,7 +1324,7 @@ class Shop {
   }
 
   generate() {
-    const weaponPool = WEAPONS.filter((weapon) => weaponRestrictionFilter(this.game.player.characterId, weapon.id));
+    const weaponPool = getShopWeaponPool(this.game.player.characterId);
     const upgradePool = UPGRADE_DEFS;
     const totalItems = 4;
     const selection = [];
@@ -1584,7 +1607,7 @@ class Game {
   }
 
   canBuyWeapon(weaponId) {
-    return weaponRestrictionFilter(this.player.characterId, weaponId);
+    return characterCanEquipWeapon(this.player.characterId, weaponId, true);
   }
 
   canBuyUpgrade(upgradeId) {
