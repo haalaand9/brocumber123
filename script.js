@@ -1078,8 +1078,9 @@ class Player {
     }
 
     const bonusMultiplier = 1 + (this.attackSpeed || 0) / 100;
+    const previousHealthRatio = this.maxHealth > 0 ? this.health / this.maxHealth : 1;
     this.baseMaxHealth = clamp(15 + effective.maxHealth, 6, 300);
-    this.maxHealth = clamp(this.maxHealth + (this.baseMaxHealth - this.maxHealth) * 0.5 + (this.baseMaxHealth - this.maxHealth) * 0.05, 6, 300);
+    this.maxHealth = this.baseMaxHealth;
 
     this.meleeDamage = effective.meleeDamage;
     this.rangedDamage = effective.rangedDamage;
@@ -1089,10 +1090,7 @@ class Player {
     this.coinBonus = effective.coinBonus;
     this.attackSpeed = effective.attackSpeed;
 
-    const maxHealthFromBase = clamp(this.baseMaxHealth, 6, 300);
-    if (this.health > maxHealthFromBase) {
-      this.health = maxHealthFromBase;
-    }
+    this.health = clamp(this.maxHealth * previousHealthRatio, 0, this.maxHealth);
     if (this.health <= 0) {
       this.health = 1;
     }
