@@ -1428,7 +1428,9 @@ class Game {
     this.rerollCost = 12;
     this.gameOver = false;
     this.cucumbers = [];
+    this.menuCharacters = [];
     this.lastMenuCucumberSpawn = 0;
+    this.lastMenuCharacterSpawn = 0;
     this.lastMenuTimestamp = performance.now();
 
     this.bindUI();
@@ -2219,6 +2221,23 @@ class Game {
       });
     }
 
+    this.lastMenuCharacterSpawn += delta;
+    if (this.lastMenuCharacterSpawn > 1800) {
+      this.lastMenuCharacterSpawn = 0;
+      const characterId = CHARACTERS[Math.floor(Math.random() * CHARACTERS.length)].id;
+      this.menuCharacters.push({
+        x: 40 + Math.random() * (ARENA_WIDTH - 80),
+        y: -40,
+        speed: 1.0 + Math.random() * 2.1,
+        drift: (Math.random() - 0.5) * 0.85,
+        rotation: (Math.random() - 0.5) * 0.8,
+        scale: 0.75 + Math.random() * 0.95,
+        characterId,
+        sway: 0.8 + Math.random() * 2.2,
+        phase: Math.random() * Math.PI * 2
+      });
+    }
+
     for (let i = this.cucumbers.length - 1; i >= 0; i -= 1) {
       const cucumber = this.cucumbers[i];
       cucumber.y += cucumber.speed * (delta / 16.66);
@@ -2227,6 +2246,17 @@ class Game {
 
       if (cucumber.y > ARENA_HEIGHT + 30 || cucumber.x < -40 || cucumber.x > ARENA_WIDTH + 40) {
         this.cucumbers.splice(i, 1);
+      }
+    }
+
+    for (let i = this.menuCharacters.length - 1; i >= 0; i -= 1) {
+      const character = this.menuCharacters[i];
+      character.y += character.speed * (delta / 16.66);
+      character.x += character.drift * (delta / 16.66) + Math.sin((character.y + character.phase) * 0.05) * 0.25 * (delta / 16.66);
+      character.rotation += 0.004 * (delta / 16.66) * character.sway;
+
+      if (character.y > ARENA_HEIGHT + 55 || character.x < -50 || character.x > ARENA_WIDTH + 50) {
+        this.menuCharacters.splice(i, 1);
       }
     }
   }
@@ -2271,6 +2301,42 @@ class Game {
     ctx.lineTo(18, 9);
     ctx.stroke();
 
+    ctx.restore();
+  }
+
+  drawMenuCharacter(ctx, character) {
+    const costumeMap = {
+      normal: { body: "#79db75", accent: "#5ec765", extra: "#1b3a1f" },
+      ranger: { body: "#7bb0ff", accent: "#c3d8ff", extra: "#2d4577" },
+      brawler: { body: "#d8844d", accent: "#f4bb7d", extra: "#4d2411" },
+      robot: { body: "#c4d0db", accent: "#7f8ea3", extra: "#2a3540" },
+      soldier: { body: "#7aa37a", accent: "#b7d39f", extra: "#1e3823" },
+      king: { body: "#d9b75e", accent: "#fbe39a", extra: "#6e4a00" },
+      prince: { body: "#d99df8", accent: "#f8dcff", extra: "#5e2f66" },
+      princess: { body: "#f9b4d9", accent: "#ffdff0", extra: "#6a3d52" },
+      athlete: { body: "#57d0a7", accent: "#beeedd", extra: "#1e6e52" },
+      guardian: { body: "#84b7ff", accent: "#dfeeff", extra: "#2b4c7b" },
+      inventor: { body: "#8fd4c5", accent: "#d8f7f1", extra: "#255b50" },
+      dog: { body: "#8ea38d", accent: "#cddbc5", extra: "#203924" },
+      cat: { body: "#a9d06c", accent: "#dff7b0", extra: "#3d5f25" },
+      god: { body: "#f0d77a", accent: "#fff3b0", extra: "#7b6217" },
+      mom: { body: "#dbb3a8", accent: "#f3d9d4", extra: "#764d41" },
+      teen: { body: "#7fe0d3", accent: "#d9f8f4", extra: "#1d5d5a" },
+      baby: { body: "#7ecb88", accent: "#d0f3bb", extra: "#2b5f33" },
+      bounty_hunter: { body: "#d0a25e", accent: "#f5d7a3", extra: "#60421a" },
+      shapeshifter: { body: "#88c77d", accent: "#d3f0ad", extra: "#2a4d29" },
+      graduate_student: { body: "#88a5ff", accent: "#dfe7ff", extra: "#294178" },
+      jockey: { body: "#7db5d0", accent: "#d8f5ff", extra: "#184b5d" },
+      old: { body: "#9ca9b8", accent: "#dfe8f4", extra: "#4c5867" },
+      well_rounded: { body: "#b6d77b", accent: "#e9f8d8", extra: "#486c31" },
+      crazy: { body: "#ff8c5a", accent: "#ffd5a7", extra: "#6e2b1a" }
+    };
+
+    ctx.save();
+    ctx.translate(character.x, character.y);
+    ctx.rotate(character.rotation);
+    ctx.scale(character.scale, character.scale);
+    drawPixelCharacterAvatar(ctx, character.characterId, costumeMap[character.characterId] || costumeMap.normal);
     ctx.restore();
   }
 
@@ -2344,6 +2410,7 @@ class Game {
     }
 
     this.cucumbers.forEach((cucumber) => this.drawMenuCucumber(ctx, cucumber));
+    this.menuCharacters.forEach((character) => this.drawMenuCharacter(ctx, character));
   }
 
   render() {
