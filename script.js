@@ -222,7 +222,7 @@ const WEAPONS = [
   { id: "suitcase", name: "Suitcase", category: "Other", type: "melee", damage: 4, reload: 0.57, price: 8, color: "#d2c7a6", description: "A surprising melee finisher.", attack: "melee", range: 25 },
   { id: "sword", name: "Sword", category: "Medieval", type: "melee", damage: 14, reload: 0.76, price: 16, color: "#dfe6ff", description: "Classic steel swing.", attack: "melee", range: 25 },
   { id: "crowbar", name: "Crowbar", category: "Other", type: "melee", damage: 12, reload: 0.85, price: 15, color: "#dcd7b3", description: "Cracks through armor.", attack: "melee", range: 25 },
-  { id: "minigun", name: "Minigun", category: "Gun", type: "ranged", damage: 0.75, reload: 0.12, price: 22, color: "#cfe6ff", description: "Very fast spray of bullets.", attack: "projectile", range: 12.5 },
+  { id: "minigun", name: "Minigun", category: "Gun", type: "ranged", damage: -0.75, reload: 0.12, price: 22, color: "#cfe6ff", description: "Very fast spray of bullets.", attack: "projectile", range: 12.5 },
   { id: "shotgun", name: "Shotgun", category: "Gun", type: "ranged", damage: 15, reload: 1.12, price: 18, color: "#f2d0aa", description: "Fires a spread of pellets.", attack: "shotgun", range: 25 },
   { id: "spear", name: "Spear", category: "Medieval", type: "melee", damage: 6, reload: 1.01, price: 13, color: "#d2e7d8", description: "Long reach with strong thrusts.", attack: "melee", range: 25 },
   { id: "torch", name: "Torch", category: "Medieval", type: "melee", damage: 8, reload: 0.75, price: 12, color: "#ffb76b", description: "Burning melee weapon.", attack: "melee", range: 25 },
@@ -990,6 +990,7 @@ class Player {
 
   getEffectiveWeaponDamage(weapon) {
     const weaponDef = getWeaponById(weapon.id);
+    if (weapon.id === "minigun") return -0.75;
     const bonus = weaponDef.type === "melee" ? this.meleeDamage : this.rangedDamage;
     return weaponDef.damage + bonus;
   }
@@ -2137,11 +2138,14 @@ class Game {
 
   applyEnemyDamage(enemy, amount, hitX, hitY, source) {
     if (!enemy || enemy.hp <= 0) return;
-    enemy.hp -= amount;
+
+    const effectiveAmount = amount < 0 ? Math.abs(amount) : amount;
+    enemy.hp -= effectiveAmount;
     enemy.hitFlash = 1;
 
     if (SETTINGS.damageNumbers) {
-      this.particles.push(new Particle({ x: enemy.x, y: enemy.y - 10, vx: 0, vy: -30, radius: 2, color: "#ffffff", life: 0.7, text: `-${Math.round(amount)}`, type: "text" }));
+      const label = amount < 0 ? `-${Math.round(Math.abs(amount))}` : `-${Math.round(amount)}`;
+      this.particles.push(new Particle({ x: enemy.x, y: enemy.y - 10, vx: 0, vy: -30, radius: 2, color: "#ffffff", life: 0.7, text: label, type: "text" }));
     }
 
     this.createBurst(hitX, hitY, source === "rocket" ? "#ffb870" : "#ffe7a7", 8, 0.35);
